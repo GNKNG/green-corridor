@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Constable Road Green Corridor - wildlife sightings</title>
+<style>
+body{font-family:system-ui,Arial,sans-serif;max-width:34em;margin:0 auto;padding:1em;line-height:1.5}
+h1{font-size:1.3em}
+.addr{display:flex;gap:.6em;align-items:flex-end;margin:.6em 0}
+.addr label{font-weight:bold}
+#street{width:14em;padding:.5em;font-size:1em}
+#years{width:3.5em;padding:.5em;font-size:1em}
+table{border-collapse:collapse;width:100%;margin:.6em 0}
+th,td{padding:.45em .3em;text-align:center}
+th:first-child,td:first-child{text-align:left}
+th{font-size:.85em;color:#444}
+tr{border-top:1px solid #ddd}
+input[type=radio]{width:1.3em;height:1.3em}
+textarea{width:100%;padding:.5em;font-size:1em}
+button{font-size:1.1em;padding:.6em 1.2em;margin-top:1em}
+.small{font-size:.9em;color:#444}
+</style>
+</head>
+<body>
+<h1>Constable Road Green Corridor</h1>
+<form id="s">
+<div class="addr">
+<label>Street + house no:<br><input type="text" id="street"></label>
+<label>Years here:<br><input type="text" id="years" inputmode="numeric"></label>
+</div>
+<p><strong>What wildlife have you seen in your garden and around the area
+while you have been living here?</strong></p>
+<table>
+<tr><th></th><th>Never</th><th>Occasionally</th><th>Quite often</th></tr>
+<tr><td>Badger</td><td><input type="radio" name="badger" value="never"></td><td><input type="radio" name="badger" value="occasionally"></td><td><input type="radio" name="badger" value="often"></td></tr>
+<tr><td>Hedgehog</td><td><input type="radio" name="hedgehog" value="never"></td><td><input type="radio" name="hedgehog" value="occasionally"></td><td><input type="radio" name="hedgehog" value="often"></td></tr>
+<tr><td>Fox</td><td><input type="radio" name="fox" value="never"></td><td><input type="radio" name="fox" value="occasionally"></td><td><input type="radio" name="fox" value="often"></td></tr>
+<tr><td>Toad / frog</td><td><input type="radio" name="toad" value="never"></td><td><input type="radio" name="toad" value="occasionally"></td><td><input type="radio" name="toad" value="often"></td></tr>
+<tr><td>Newt</td><td><input type="radio" name="newt" value="never"></td><td><input type="radio" name="newt" value="occasionally"></td><td><input type="radio" name="newt" value="often"></td></tr>
+</table>
+<label><strong>Any other comments:</strong>
+<textarea id="comments" rows="3"></textarea></label>
+<label><input type="checkbox" id="info"> Yes, keep me informed about the corridor.</label>
+<button type="button" onclick="send()">Send via WhatsApp</button>
+</form>
+<p class="small">Or tell us on the doorstep / paper slip: street, years,
+ticks per animal, signature + date.</p>
+<script>
+function freq(n){var e=document.querySelector('input[name="'+n+'"]:checked');return e?e.value:"-";}
+function send(){
+var msg="Corridor sighting%0AStreet: "+encodeURIComponent(document.getElementById("street").value)+"%0AYears: "+encodeURIComponent(document.getElementById("years").value)+"%0ABadger: "+freq("badger")+"%0AHedgehog: "+freq("hedgehog")+"%0AFox: "+freq("fox")+"%0AToad/frog: "+freq("toad")+"%0ANewt: "+freq("newt")+"%0AComments: "+encodeURIComponent(document.getElementById("comments").value)+"%0AKeep informed: "+(document.getElementById("info").checked?"yes":"no");
+window.open("https://wa.me/447564847372?text="+msg,"_blank");
+}
+</script>
+</body>
+</html>
