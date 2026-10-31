@@ -42,16 +42,17 @@ while you have been living here?</strong></p>
 <label><strong>Any other comments:</strong>
 <textarea id="comments" rows="3"></textarea></label>
 <label><input type="checkbox" id="info"> Yes, keep me informed about the corridor.</label>
-<button type="button" onclick="send()">Send via WhatsApp</button>
+<button type="button" onclick="send()">Send</button>
 </form>
 <p class="small">Or tell us on the doorstep / paper slip: street, years,
 ticks per animal, signature + date.</p>
-<p class="small"><a href="leaflet.html">About the Green Corridor leaflet</a></p>
+<p class="small"><a href="leaflet-online.png">About the Green Corridor leaflet</a></p>
+<p id="thanks" style="display:none;font-weight:bold">Thanks — recorded.</p>
 <script>
 function freq(n){var e=document.querySelector('input[name="'+n+'"]:checked');return e?e.value:"-";}
 function send(){
-var msg="Corridor sighting%0AStreet: "+encodeURIComponent(document.getElementById("street").value)+"%0AYears: "+encodeURIComponent(document.getElementById("years").value)+"%0ABadger: "+freq("badger")+"%0AHedgehog: "+freq("hedgehog")+"%0AFox: "+freq("fox")+"%0AToad/frog: "+freq("toad")+"%0ANewt: "+freq("newt")+"%0AComments: "+encodeURIComponent(document.getElementById("comments").value)+"%0AKeep informed: "+(document.getElementById("info").checked?"yes":"no");
-window.open("https://wa.me/447564847372?text="+msg,"_blank");
+var data={_subject:"Corridor sighting",street:document.getElementById("street").value,years:document.getElementById("years").value,badger:freq("badger"),hedgehog:freq("hedgehog"),fox:freq("fox"),toad:freq("toad"),newt:freq("newt"),comments:document.getElementById("comments").value,keep_informed:document.getElementById("info").checked?"yes":"no"};
+fetch("https://formsubmit.co/ajax/trowelandmattock@yahoo.co.uk",{method:"POST",headers:{"Content-Type":"application/json","Accept":"application/json"},body:JSON.stringify(data)}).then(function(){document.getElementById("thanks").style.display="block";}).catch(function(){alert("Could not send — tell us on the doorstep instead.");});
 }
 </script>
 </body>
