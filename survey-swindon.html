@@ -51,25 +51,31 @@ button{font-size:1.1em;padding:.6em 1.2em;margin-top:1em}
 <textarea id="meaning" rows="2"></textarea></label>
 <label><strong>Does it join on to something, or does it stop?</strong> In general words: another green, wood, hedge, stream, field edge, railway, road or fence?<br>
 <textarea id="joins" rows="2"></textarea></label>
-<label><input type="checkbox" id="tend"> I already tidy or tend this place, or would help keep it.</label>
+<label><input type="checkbox" id="tend"> I would be interested in helping to look after this place in future.</label>
 <label><strong>House number <span class="opt">(optional, private form only - redacted in any public copy):</span></strong><br>
 <input type="text" id="house" placeholder="leave blank if you prefer"></label>
 <label><strong>Any other comments:</strong>
 <textarea id="comments" rows="3"></textarea></label>
 <label><input type="checkbox" id="info"> Yes, keep me informed.</label>
 <label><input type="checkbox" id="quote"> I agree my name and answers may be quoted in the draft pack sent to the Council.</label>
-<button type="button" onclick="send()">Send</button>
+<button type="button" id="sendbtn" onclick="send()">Send</button> <span id="thanks" style="display:none;font-weight:bold">Sent, thanks!</span>
 </form>
-<p class="small">Or tell us on paper: place, street, parcel ID if known, ticks per animal, use, meaning, joins, tend tick, quote Y/N, signed + dated. Never write exact sett locations.</p>
+<p class="small">Or tell us on paper: place, street, parcel ID if known, ticks per animal, use, meaning, joins, interested-in-helping Y/N, quote Y/N, signed + dated. Never write exact sett locations.</p>
 <p class="small">Formal representations go to the Council directly: <a href="https://consultations.swindon.gov.uk/publication-stage-swindon-local-plan-2043">Reg 19 hub</a>. Comments here are conversation only, not survey returns.</p>
-<p id="thanks" style="display:none;font-weight:bold">Thanks - recorded.</p>
 <script>
 var FORM_ENDPOINT = "https://formsubmit.co/ajax/trowelandmattock@yahoo.co.uk";
 function freq(n){var e=document.querySelector('input[name="'+n+'"]:checked');return e?e.value:"-";}
+function done(msg){
+  var b=document.getElementById("sendbtn");
+  b.textContent=msg; b.disabled=true;
+  var t=document.getElementById("thanks");
+  t.textContent=msg; t.style.display="inline";
+  b.scrollIntoView({block:"nearest"});
+}
 function send(){
 var data={_subject:"Swindon green link",place:document.getElementById("place").value,street:document.getElementById("street").value,parcel:document.getElementById("parcel").value,years:document.getElementById("years").value,badger:freq("badger"),hedgehog:freq("hedgehog"),fox:freq("fox"),toad:freq("toad"),newt:freq("newt"),other:document.getElementById("other").value,use:document.getElementById("use").value,meaning:document.getElementById("meaning").value,joins:document.getElementById("joins").value,tend:document.getElementById("tend").checked?"yes":"no",house:document.getElementById("house").value,comments:document.getElementById("comments").value,keep_informed:document.getElementById("info").checked?"yes":"no",quote:document.getElementById("quote").checked?"yes":"no"};
 if(FORM_ENDPOINT.indexOf("[FORM")==0){alert("Form destination not set yet - tell us on paper instead.");return;}
-fetch(FORM_ENDPOINT,{method:"POST",headers:{"Content-Type":"application/json","Accept":"application/json"},body:JSON.stringify(data)}).then(function(r){return r.json();}).then(function(j){document.getElementById("thanks").style.display="block";}).catch(function(){alert("Could not send - tell us on paper instead.");});
+fetch(FORM_ENDPOINT,{method:"POST",headers:{"Content-Type":"application/json","Accept":"application/json"},body:JSON.stringify(data)}).then(function(r){return r.json();}).then(function(j){done("Sent, thanks!");}).catch(function(){done("Could not send - tell us on paper instead.");});
 }
 </script>
 </body>
