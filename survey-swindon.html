@@ -64,7 +64,7 @@ button{font-size:1.1em;padding:.6em 1.2em;margin-top:1em}
 <p class="small">Formal representations go to the Council directly: <a href="https://consultations.swindon.gov.uk/publication-stage-swindon-local-plan-2043">Reg 19 hub</a>. Comments here are conversation only, not survey returns.</p>
 <p id="thanks" style="display:none;font-weight:bold">Thanks - recorded.</p>
 <script>
-var FORM_ENDPOINT = "[FORM_ENDPOINT]";
+var FORM_ENDPOINT = "https://formsubmit.co/ajax/trowelandmattock@yahoo.co.uk";
 function freq(n){var e=document.querySelector('input[name="'+n+'"]:checked');return e?e.value:"-";}
 function send(){
 var data={_subject:"Swindon green link",place:document.getElementById("place").value,street:document.getElementById("street").value,parcel:document.getElementById("parcel").value,years:document.getElementById("years").value,badger:freq("badger"),hedgehog:freq("hedgehog"),fox:freq("fox"),toad:freq("toad"),newt:freq("newt"),other:document.getElementById("other").value,use:document.getElementById("use").value,meaning:document.getElementById("meaning").value,joins:document.getElementById("joins").value,tend:document.getElementById("tend").checked?"yes":"no",house:document.getElementById("house").value,comments:document.getElementById("comments").value,keep_informed:document.getElementById("info").checked?"yes":"no",quote:document.getElementById("quote").checked?"yes":"no"};

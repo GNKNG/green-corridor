@@ -11,6 +11,6 @@ Files:
 
 Run locally: serve site/az-viewer over http (file:// blocks fetch). Example: python -m http.server 8000 in site/az-viewer, open http://127.0.0.1:8000/index.html.
 
-Banners: DRAFT / NOTHING FILED, indicative only, adopted EN1 vs emerging Reg 19, Constable Road separate, [FORM LINK] + [MAP URL + DATE] placeholders.
+Banners: DRAFT / NOTHING FILED, indicative only, adopted EN1 vs emerging Reg 19, Constable Road separate, survey: https://gnkng.github.io/green-corridor/survey-swindon.html, viewer: https://gnkng.github.io/green-corridor/az-viewer/ (2026-11-08).
 
 Next: parcel ID prefix freeze, street/postcode JSON drop-in, GitHub repo + Pages URL, 10-page pilot PDF from same source.
