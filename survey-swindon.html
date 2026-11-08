@@ -72,10 +72,17 @@ function done(msg){
   t.textContent=msg; t.style.display="inline";
   b.scrollIntoView({block:"nearest"});
 }
+function mailtoFallback(data){
+  var body = Object.keys(data).map(function(k){return k + ": " + data[k];}).join("\n");
+  window.location.href = "mailto:trowelandmattock@yahoo.co.uk?subject=" + encodeURIComponent(data._subject || "Swindon green link") + "&body=" + encodeURIComponent(body);
+}
 function send(){
 var data={_subject:"Swindon green link",place:document.getElementById("place").value,street:document.getElementById("street").value,parcel:document.getElementById("parcel").value,years:document.getElementById("years").value,badger:freq("badger"),hedgehog:freq("hedgehog"),fox:freq("fox"),toad:freq("toad"),newt:freq("newt"),other:document.getElementById("other").value,use:document.getElementById("use").value,meaning:document.getElementById("meaning").value,joins:document.getElementById("joins").value,tend:document.getElementById("tend").checked?"yes":"no",house:document.getElementById("house").value,comments:document.getElementById("comments").value,keep_informed:document.getElementById("info").checked?"yes":"no",quote:document.getElementById("quote").checked?"yes":"no"};
 if(FORM_ENDPOINT.indexOf("[FORM")==0){alert("Form destination not set yet - tell us on paper instead.");return;}
-fetch(FORM_ENDPOINT,{method:"POST",headers:{"Content-Type":"application/json","Accept":"application/json"},body:JSON.stringify(data)}).then(function(r){return r.json();}).then(function(j){done("Sent, thanks!");}).catch(function(){done("Could not send - tell us on paper instead.");});
+fetch(FORM_ENDPOINT,{method:"POST",headers:{"Content-Type":"application/json","Accept":"application/json"},body:JSON.stringify(data)}).then(function(r){return r.json();}).then(function(j){
+  if(j && (j.success === true || j.success === "true")){done("Sent, thanks!");}
+  else{done("Needs one email confirmation - opening your mail app instead.");mailtoFallback(data);}
+}).catch(function(){done("Could not send automatically - opening your mail app instead.");mailtoFallback(data);});
 }
 </script>
 </body>
