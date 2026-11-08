@@ -39,26 +39,71 @@
     });
   });
 
-  // Minimal local search: matches parcel IDs and SN sector text; street index lands later as drop-in.
+  // Search: parcel IDs locally, plus Swindon place navigation via Nominatim.
+  // Any postcode/street moves the map; parcels are then listed as overlapping or none-here.
   var box = document.getElementById('search');
   var out = document.getElementById('results');
-  box.addEventListener('input', function () {
-    out.innerHTML = '';
-    var q = box.value.trim().toLowerCase();
-    if (!parcels || q.length < 2) return;
-    var hits = parcels.filter(function (f) {
-      return (f.properties.id + ' ' + f.properties.short_label).toLowerCase().indexOf(q) !== -1;
-    }).slice(0, 20);
-    hits.forEach(function (f) {
-      var li = document.createElement('li');
-      li.textContent = f.properties.id;
-      li.onclick = function () { map.fitBounds(L.geoJSON(f.geometry).getBounds().pad(0.5)); };
-      out.appendChild(li);
+  var searchTimer = null;
+  function clearOut() { out.innerHTML = ''; }
+  function addLine(text, onclick) {
+    var li = document.createElement('li');
+    li.textContent = text;
+    if (onclick) li.onclick = onclick;
+    out.appendChild(li);
+  }
+  function parcelsNear(latlng) {
+    if (!parcels || !parcels.length) return [];
+    var near = [];
+    parcels.forEach(function (f) {
+      try {
+        var b = L.geoJSON(f.geometry).getBounds().pad(0.15);
+        if (b.contains(latlng)) near.push(f);
+      } catch (e) {}
     });
-    if (!hits.length) {
-      var li = document.createElement('li');
-      li.textContent = 'No parcel match. Street/postcode index lands as upgrade; pan and zoom for now.';
-      out.appendChild(li);
+    return near;
+  }
+  box.addEventListener('input', function () {
+    clearOut();
+    var q = box.value.trim();
+    if (q.length < 2) return;
+    var ql = q.toLowerCase();
+    if (parcels) {
+      parcels.filter(function (f) {
+        return (f.properties.id + ' ' + f.properties.short_label).toLowerCase().indexOf(ql) !== -1;
+      }).slice(0, 8).forEach(function (f) {
+        addLine('Parcel ' + f.properties.id, function () {
+          map.fitBounds(L.geoJSON(f.geometry).getBounds().pad(0.5));
+        });
+      });
     }
+    clearTimeout(searchTimer);
+    searchTimer = setTimeout(function () {
+      var url = 'https://nominatim.openstreetmap.org/search?format=json&limit=6&viewbox=-1.95,51.65,-1.60,51.50&bounded=1&q=' + encodeURIComponent(q + ', Swindon');
+      fetch(url).then(function (r) { return r.json(); }).then(function (rows) {
+        if (!rows || !rows.length) {
+          addLine('No place found. Try an SN postcode or street + Swindon.');
+          return;
+        }
+        rows.forEach(function (row) {
+          var ll = L.latLng(parseFloat(row.lat), parseFloat(row.lon));
+          addLine(row.display_name.split(',').slice(0, 3).join(','), function () {
+            map.setView(ll, 15);
+            clearOut();
+            var near = parcelsNear(ll);
+            if (near.length) {
+              near.forEach(function (f) {
+                addLine('Parcel here: ' + f.properties.id, function () {
+                  map.fitBounds(L.geoJSON(f.geometry).getBounds().pad(0.5));
+                });
+              });
+            } else {
+              addLine('No mapped parcel at this spot. Pan around or tell us on the form.');
+            }
+          });
+        });
+      }).catch(function () {
+        addLine('Place lookup failed (network?). Pan and zoom for now.');
+      });
+    }, 450);
   });
 })();
