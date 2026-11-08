@@ -15,7 +15,7 @@
       'Status: ' + p.status + '<br>' +
       'Source: ' + p.source + '<br>' +
       'Are you already working on this area?<br>' +
-      'Contact: [FORM LINK]<br>' +
+      'Contact: <a href="https://gnkng.github.io/green-corridor/survey-swindon.html">survey form</a><br>' +
       '<em>DRAFT / NOTHING FILED. Indicative only, not a legal boundary.</em>';
   }
 

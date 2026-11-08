@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Swindon green links - share what you know (DRAFT)</title>
+<style>
+body{font-family:system-ui,Arial,sans-serif;max-width:34em;margin:0 auto;padding:1em;line-height:1.5}
+h1{font-size:1.3em}
+.banner{background:#1f4a2c;color:#f2efe2;padding:.5em .8em;font-size:.9em;margin-bottom:1em}
+.addr{display:flex;gap:.6em;align-items:flex-end;margin:.6em 0;flex-wrap:wrap}
+.addr label{font-weight:bold}
+#place,#street{width:14em;padding:.5em;font-size:1em}
+#years{width:3.5em;padding:.5em;font-size:1em}
+table{border-collapse:collapse;width:100%;margin:.6em 0}
+th,td{padding:.45em .3em;text-align:center}
+th:first-child,td:first-child{text-align:left}
+th{font-size:.85em;color:#444}
+tr{border-top:1px solid #ddd}
+input[type=radio]{width:1.3em;height:1.3em}
+textarea{width:100%;padding:.5em;font-size:1em}
+button{font-size:1.1em;padding:.6em 1.2em;margin-top:1em}
+.small{font-size:.9em;color:#444}
+.opt{font-size:.9em;color:#444;font-weight:normal}
+</style>
+</head>
+<body>
+<div class="banner">DRAFT / NOTHING FILED. Indicative only. Individual resident, not a group. No ownership, designation, or boundary claimed.</div>
+<h1>Swindon green links - share what you know</h1>
+<p>A hedge behind the houses. A wooded strip beside an estate. A stream, railway margin or patch of scrub where you regularly see wildlife. Street or area name only - never exact sett or nest locations.</p>
+<form id="s">
+<label><strong>Which place do you mean?</strong> Name if it has one:<br><input type="text" id="place" placeholder="e.g. hedge behind ..."></label>
+<div class="addr">
+<label>Street / general area:<br><input type="text" id="street" placeholder="street only, no house number"></label>
+<label>Parcel ID if known <span class="opt">(optional):</span><br><input type="text" id="parcel" placeholder="e.g. EN1-07"></label>
+<label>Years here:<br><input type="text" id="years" inputmode="numeric"></label>
+</div>
+<p><strong>What wildlife have you seen on or beside that place?</strong> Roughly when, roughly how often.</p>
+<table>
+<tr><th></th><th>Never</th><th>Occasionally</th><th>Quite often</th></tr>
+<tr><td>Badger</td><td><input type="radio" name="badger" value="never"></td><td><input type="radio" name="badger" value="occasionally"></td><td><input type="radio" name="badger" value="often"></td></tr>
+<tr><td>Hedgehog</td><td><input type="radio" name="hedgehog" value="never"></td><td><input type="radio" name="hedgehog" value="occasionally"></td><td><input type="radio" name="hedgehog" value="often"></td></tr>
+<tr><td>Fox</td><td><input type="radio" name="fox" value="never"></td><td><input type="radio" name="fox" value="occasionally"></td><td><input type="radio" name="fox" value="often"></td></tr>
+<tr><td>Toad / frog</td><td><input type="radio" name="toad" value="never"></td><td><input type="radio" name="toad" value="occasionally"></td><td><input type="radio" name="toad" value="often"></td></tr>
+<tr><td>Newt</td><td><input type="radio" name="newt" value="never"></td><td><input type="radio" name="newt" value="occasionally"></td><td><input type="radio" name="newt" value="often"></td></tr>
+<tr><td>Other</td><td colspan="3"><input type="text" id="other" placeholder="what, when, how often"></td></tr>
+</table>
+<label><strong>How do you use that place?</strong> (walking, play, dog-walking, sitting, passing through)<br>
+<textarea id="use" rows="2"></textarea></label>
+<label><strong>What does that place and its wildlife mean to you?</strong> A sentence or two.<br>
+<textarea id="meaning" rows="2"></textarea></label>
+<label><strong>Does it join on to something, or does it stop?</strong> In general words: another green, wood, hedge, stream, field edge, railway, road or fence?<br>
+<textarea id="joins" rows="2"></textarea></label>
+<label><input type="checkbox" id="tend"> I already tidy or tend this place, or would help keep it.</label>
+<label><strong>House number <span class="opt">(optional, private form only - redacted in any public copy):</span></strong><br>
+<input type="text" id="house" placeholder="leave blank if you prefer"></label>
+<label><strong>Any other comments:</strong>
+<textarea id="comments" rows="3"></textarea></label>
+<label><input type="checkbox" id="info"> Yes, keep me informed.</label>
+<label><input type="checkbox" id="quote"> I agree my name and answers may be quoted in the draft pack sent to the Council.</label>
+<button type="button" onclick="send()">Send</button>
+</form>
+<p class="small">Or tell us on paper: place, street, parcel ID if known, ticks per animal, use, meaning, joins, tend tick, quote Y/N, signed + dated. Never write exact sett locations.</p>
+<p class="small">Formal representations go to the Council directly: <a href="https://consultations.swindon.gov.uk/publication-stage-swindon-local-plan-2043">Reg 19 hub</a>. Comments here are conversation only, not survey returns.</p>
+<p id="thanks" style="display:none;font-weight:bold">Thanks - recorded.</p>
+<script>
+var FORM_ENDPOINT = "[FORM_ENDPOINT]";
+function freq(n){var e=document.querySelector('input[name="'+n+'"]:checked');return e?e.value:"-";}
+function send(){
+var data={_subject:"Swindon green link",place:document.getElementById("place").value,street:document.getElementById("street").value,parcel:document.getElementById("parcel").value,years:document.getElementById("years").value,badger:freq("badger"),hedgehog:freq("hedgehog"),fox:freq("fox"),toad:freq("toad"),newt:freq("newt"),other:document.getElementById("other").value,use:document.getElementById("use").value,meaning:document.getElementById("meaning").value,joins:document.getElementById("joins").value,tend:document.getElementById("tend").checked?"yes":"no",house:document.getElementById("house").value,comments:document.getElementById("comments").value,keep_informed:document.getElementById("info").checked?"yes":"no",quote:document.getElementById("quote").checked?"yes":"no"};
+if(FORM_ENDPOINT.indexOf("[FORM")==0){alert("Form destination not set yet - tell us on paper instead.");return;}
+fetch(FORM_ENDPOINT,{method:"POST",headers:{"Content-Type":"application/json","Accept":"application/json"},body:JSON.stringify(data)}).then(function(r){return r.json();}).then(function(j){document.getElementById("thanks").style.display="block";}).catch(function(){alert("Could not send - tell us on paper instead.");});
+}
+</script>
+</body>
+</html>
