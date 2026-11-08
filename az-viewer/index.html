@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Swindon green spaces - residents map (DRAFT)</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header id="banner">
+  <strong>DRAFT / NOTHING FILED.</strong>
+  Indicative only, not a legal boundary. Adopted EN1 context only, not the emerging Reg 19 layer.
+  Constable Road SN2 7JF is a separate case.
+  <span id="banner-date">Data date: 2026-11-08</span>
+</header>
+<div id="layout">
+  <aside id="panel">
+    <h1>Swindon green spaces - residents map</h1>
+    <p class="sub">Draft borough overview. Are groups or parishes already working on these areas?</p>
+    <label for="search">Find street or postcode sector (e.g. SN2, SN25):</label>
+    <input id="search" type="text" placeholder="Type SN sector or street name" autocomplete="off">
+    <ul id="results"></ul>
+    <h2>Parcels (<span id="count">0</span>)</h2>
+    <ul id="parcel-list"></ul>
+    <h2>About</h2>
+    <p>The map shows adopted EN1 green corridors as context. The proposed (emerging) Local Plan map is not yet adopted. Not seeing a place here does not by itself settle its status. That is for the Council to check.</p>
+    <p>Contact: <span class="ph">[FORM LINK]</span>. Full map: <span class="ph">[MAP URL + DATE]</span>.</p>
+    <p><a href="https://consultations.swindon.gov.uk/publication-stage-swindon-local-plan-2043">Council Reg 19 hub (formal route only)</a></p>
+  </aside>
+  <div id="map"></div>
+</div>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
