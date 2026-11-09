@@ -62,6 +62,10 @@
       v = nonempty(p.map_label) || nonempty(p.short_ref); if (v) return v;
       v = en1Short(p); if (v) return v;
     }
+    if (fc === 'amenity_water') {
+      for (i=0;i<generic.length;i++){ v=nonempty(p[generic[i]]); if(v && String(v).indexOf('osm-waterway')!==0) return v; }
+      return 'Water';
+    }
     for (i=0;i<official.length;i++){ v=nonempty(p[official[i]]); if(v) return v; }
     for (i=0;i<generic.length;i++){ v=nonempty(p[generic[i]]); if(v) return v; }
     return String(p.id || '');
@@ -201,7 +205,7 @@
   }
 
   function loadParcels() {
-    return fetch('data/parcels-public.geojson').then(function (r) { return r.json(); }).then(function (fc) {
+    return fetch('data/parcels-public.geojson?v=15').then(function (r) { return r.json(); }).then(function (fc) {
       parcels = fc.features || [];
       var proposedSeq = buildProposedSeq(parcels);
       parcels.forEach(function (f) { f.properties = f.properties || {}; f.properties._label = displayLabel(f.properties, proposedSeq, null); });
