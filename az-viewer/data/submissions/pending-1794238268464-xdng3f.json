@@ -1,0 +1,41 @@
+{
+  "type": "Feature",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          -1.929131,
+          51.589656
+        ],
+        [
+          -1.9487,
+          51.576429
+        ],
+        [
+          -1.916771,
+          51.575789
+        ],
+        [
+          -1.929131,
+          51.589656
+        ]
+      ]
+    ]
+  },
+  "properties": {
+    "feature_class": "community_suggestion",
+    "status": "pending_review",
+    "submitted_at": "2026-11-09T15:31:08Z",
+    "place": "",
+    "street_area": "consable",
+    "broad_type": "",
+    "wildlife_tick": false,
+    "use_note": "",
+    "meaning_note": "",
+    "joins_barrier": "",
+    "interested_in_helping": "",
+    "quote_ok": "",
+    "ip_hash": "be7ba12180df3307"
+  }
+}
