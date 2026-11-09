@@ -113,6 +113,20 @@
   var overlays = {};
   var layersControl = null;
   var myPendingLayer = L.layerGroup();
+  var selectedLabelLayer = null;
+  function clearSelectedLabel() {
+    try { if (selectedLabelLayer && selectedLabelLayer.closeTooltip) selectedLabelLayer.closeTooltip(); } catch (e) {}
+    try { if (selectedLabelLayer && selectedLabelLayer.unbindTooltip) { /* keep popup */ } } catch (e) {}
+    selectedLabelLayer = null;
+  }
+  function showSelectedLabel(l, lab, cls) {
+    clearSelectedLabel();
+    selectedLabelLayer = l;
+    try {
+      l.bindTooltip(String(lab), { permanent: true, direction: 'center', className: 'feat-label feat-' + (cls || ''), opacity: 1 }).openTooltip();
+    } catch (e) {}
+  }
+  map.on('click', function () { clearSelectedLabel(); });
 
   var LOCAL_KEY = 'gc_pending_v1';
   function loadLocalPending() {
@@ -138,7 +152,7 @@
         pointToLayer: function (f, latlng) { return L.circleMarker(latlng, { radius: 7, color: meta.color, fillColor: meta.fill, fillOpacity: 0.7, weight: 2 }); },
         onEachFeature: function (f, l) {
           l.bindPopup(popupHtml(f.properties, lab));
-          l.bindTooltip(String(lab), { permanent: true, direction: 'center', className: 'feat-label feat-my_pending' });
+          l.on('click', function (ev) { try { L.DomEvent.stopPropagation(ev); } catch(e){} showSelectedLabel(l, lab, 'my_pending'); });
         }
       });
       g.eachLayer(function (l) { myPendingLayer.addLayer(l); });
@@ -206,7 +220,7 @@
           onEachFeature: function (f, l) {
             var lab = f.properties._label || f.properties.id;
             l.bindPopup(popupHtml(f.properties, lab));
-            if (cls !== 'amenity_water') l.bindTooltip(String(lab), { permanent: true, direction: 'center', className: 'feat-label feat-' + cls });
+            l.on('click', function (ev) { try { L.DomEvent.stopPropagation(ev); } catch(e){} showSelectedLabel(l, lab, cls); });
           }
         });
         if (cls !== 'amenity_water') groups[cls].addTo(map); // amenity_water off by default (695 features)
@@ -254,7 +268,7 @@
         onEachFeature: function (f, l) {
           var lab = f.properties._label || 'C';
           l.bindPopup(popupHtml(f.properties, lab));
-          l.bindTooltip(String(lab), { permanent: true, direction: 'center', className: 'feat-label feat-community_suggestion' });
+          l.on('click', function (ev) { try { L.DomEvent.stopPropagation(ev); } catch(e){} showSelectedLabel(l, lab, 'community_suggestion'); });
         }
       });
       // off by default (user toggles on); listed last
