@@ -1,5 +1,14 @@
 /* Read-only borough viewer. No editing, no backend, no login. */
 (function () {
+  var layout = document.getElementById('layout');
+  var toggle = document.getElementById('panel-toggle');
+  if (window.innerWidth < 700) layout.classList.add('panel-hidden');
+  toggle.onclick = function () {
+    layout.classList.toggle('panel-hidden');
+    toggle.textContent = layout.classList.contains('panel-hidden') ? '☰' : '✕';
+    toggle.setAttribute('aria-label', layout.classList.contains('panel-hidden') ? 'Show panel' : 'Hide panel');
+    setTimeout(function () { map.invalidateSize(); }, 50);
+  };
   var map = L.map('map').setView([51.568, -1.78], 11);
   var osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     maxZoom: 19,
