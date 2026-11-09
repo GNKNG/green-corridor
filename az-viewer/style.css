@@ -5,7 +5,7 @@ body { font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-se
 #layout { display: flex; height: calc(100vh - 28px); position: relative; }
 #panel { width: 340px; min-width: 300px; overflow-y: auto; padding: 12px 14px; border-right: 1px solid #c4d3b8; background: #fbf7ec; }
 #layout.panel-hidden #panel { display: none; }
-#panel-toggle { position: absolute; top: 8px; left: 8px; z-index: 1000; background: #1F4A2C; color: #fff; border: 0; border-radius: 4px; font-size: 18px; padding: 6px 10px; cursor: pointer; }
+#panel-toggle { position: absolute; top: 64px; left: 8px; z-index: 2000; background: #A8452F; color: #fff; border: 2px solid #fff; border-radius: 6px; font-size: 14px; font-weight: 700; padding: 8px 12px; cursor: pointer; box-shadow: 0 2px 6px rgba(0,0,0,.4); }
 @media (max-width: 700px) {
   #panel { position: absolute; z-index: 900; height: 100%; box-shadow: 2px 0 8px rgba(0,0,0,.3); }
   #layout.panel-hidden #panel { display: none; }

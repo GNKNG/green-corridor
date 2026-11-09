@@ -2,10 +2,11 @@
 (function () {
   var layout = document.getElementById('layout');
   var toggle = document.getElementById('panel-toggle');
-  if (window.innerWidth < 700) layout.classList.add('panel-hidden');
+  if (window.innerWidth < 700) { layout.classList.add('panel-hidden'); toggle.textContent = '☰ Show panel'; }
   toggle.onclick = function () {
     layout.classList.toggle('panel-hidden');
-    toggle.textContent = layout.classList.contains('panel-hidden') ? '☰' : '✕';
+    var hidden = layout.classList.contains('panel-hidden');
+    toggle.textContent = hidden ? '☰ Show panel' : '✕ Hide panel';
     toggle.setAttribute('aria-label', layout.classList.contains('panel-hidden') ? 'Show panel' : 'Hide panel');
     setTimeout(function () { map.invalidateSize(); }, 50);
   };
