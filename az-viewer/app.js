@@ -12,9 +12,8 @@
   };
 
   var map = L.map('map').setView([51.568, -1.78], 11);
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png', {
-    maxZoom: 19, subdomains: 'abcd',
-    attribution: '&copy; OpenStreetMap contributors &copy; CARTO'
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19, attribution: 'OpenStreetMap contributors'
   }).addTo(map);
 
   function esc(s) { return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
@@ -209,7 +208,8 @@
             l.bindPopup(popupHtml(f.properties, lab));
             if (cls !== 'amenity_water') l.bindTooltip(String(lab), { permanent: true, direction: 'center', className: 'feat-label feat-' + cls });
           }
-        }).addTo(map);
+        });
+        if (cls !== 'amenity_water') groups[cls].addTo(map); // amenity_water off by default (695 features)
       });
       injectHatchDefs();
       order.forEach(function (cls) { if (CLASS_META[cls] && CLASS_META[cls].hatch) applyHatch(groups[cls], cls); });
