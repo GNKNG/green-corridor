@@ -173,6 +173,7 @@
     if (p.use_note) rows.push('Use: ' + esc(p.use_note));
     if (p.meaning_note) rows.push('Meaning: ' + esc(p.meaning_note));
     if (p.joins_barrier) rows.push('Joins/barrier: ' + esc(p.joins_barrier));
+    if (p.notes || p.notes_note) rows.push('Notes: ' + esc(p.notes || p.notes_note));
     return '<strong>' + esc(lab) + '</strong> <span style="color:#666">(community)</span><br>' +
       'Type: ' + esc(CLASS_META.community_suggestion.label) + '<br>' +
       (rows.length ? rows.join('<br>') + '<br>' : '') +
@@ -184,7 +185,10 @@
     if (p.street_area || p.street) rows.push('Area: ' + esc(p.street_area || p.street));
     if (p.broad_type) rows.push('Type: ' + esc(p.broad_type));
     if (p.wildlife_tick) rows.push('Wildlife noted (general)');
-    if (p.use_note) rows.push('Use: ' + esc(p.use_note));
+    if (p.use_note || p.use) rows.push('Use: ' + esc(p.use_note || p.use));
+    if (p.meaning_note || p.meaning) rows.push('Meaning: ' + esc(p.meaning_note || p.meaning));
+    if (p.joins_barrier) rows.push('Joins/barrier: ' + esc(p.joins_barrier));
+    if (p.notes || p.notes_note) rows.push('Notes: ' + esc(p.notes || p.notes_note));
     return '<strong>' + esc(lab) + '</strong> <span style="color:#666">(pending)</span><br>' +
       'Type: ' + esc(CLASS_META.my_pending.label) + '<br>' +
       (rows.length ? rows.join('<br>') + '<br>' : '') +
@@ -432,10 +436,11 @@
       use: asciiVal(document.getElementById('c-use').value).trim(),
       meaning: asciiVal(document.getElementById('c-meaning').value).trim(),
       joins_barrier: asciiVal(document.getElementById('c-joins').value).trim(),
+      notes: asciiVal(document.getElementById('c-notes').value).trim(),
       interested_in_helping: asciiVal(document.getElementById('c-help').value),
       quote_ok: asciiVal(document.getElementById('c-quote').value)
     };
-    if (hasSensitiveClient([place, street, attrs.use, attrs.meaning, attrs.joins_barrier].join(' '))) {
+    if (hasSensitiveClient([place, street, attrs.use, attrs.meaning, attrs.joins_barrier, attrs.notes].join(' '))) {
       setResult('Please do not include precise wildlife locations (sett, den, nest, roost). Keep it street-level and general.', 'err');
       return;
     }

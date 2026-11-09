@@ -6,7 +6,7 @@
 <title>Swindon green corridors - residents map (DRAFT)</title>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <link rel="stylesheet" href="https://unpkg.com/@geoman-io/leaflet-geoman-free@2.16.0/dist/leaflet-geoman.css">
-<link rel="stylesheet" href="style.css?v=16">
+<link rel="stylesheet" href="style.css?v=17">
 </head>
 <body>
 <header id="banner">
@@ -28,7 +28,7 @@
     <p class="sub">Draw an <strong>indicative</strong> area or marker on the map and tell us about it. Not a boundary, designation, survey, approval, or ownership claim. Submissions are reviewed before they appear. No email collected - to get in touch, use the <a href="https://gnkng.github.io/green-corridor/survey-swindon.html">contact/survey form</a>.</p>
     <div class="draw-controls">
       <button type="button" id="draw-area" class="btn">Draw area (freehand)</button>
-      <button type="button" id="draw-marker" class="btn">Add marker</button>
+      <button type="button" id="draw-marker" class="btn">Add marker (point/flag)</button>
       <button type="button" id="draw-clear" class="btn btn-muted">Clear drawing</button>
     </div>
     <p id="draw-status" class="sub" aria-live="polite">No drawing yet.</p>
@@ -55,6 +55,8 @@
       <textarea id="c-meaning" name="meaning" maxlength="500" rows="2"></textarea>
       <label for="c-joins">Does it join places or act as a barrier?</label>
       <input id="c-joins" name="joins_barrier" type="text" maxlength="300" autocomplete="off">
+      <label for="c-notes">Notes (optional, free text)</label>
+      <textarea id="c-notes" name="notes" maxlength="800" rows="2"></textarea>
       <label for="c-help">Interested in helping? (optional)</label>
       <select id="c-help" name="interested_in_helping">
         <option value="">Prefer not to say</option>
@@ -84,6 +86,6 @@
 <script>window.COMMUNITY_SUBMIT_URL = 'https://twilight-violet-8787.danmillerarchaeology.workers.dev';</script>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://unpkg.com/@geoman-io/leaflet-geoman-free@2.16.0/dist/leaflet-geoman.min.js"></script>
-<script src="app.js?v=16"></script>
+<script src="app.js?v=17"></script>
 </body>
 </html>

@@ -106,7 +106,8 @@ async function handleSubmission(body, ip, env) {
   var place = clampText(attrs.place, 120);
   var street = stripHouseNumber(attrs.street || attrs.street_area || '');
   street = clampText(street, 120);
-  var combined = [place, street, attrs.use, attrs.meaning, attrs.joins_barrier, attrs.broad_type].join(' ');
+  var notes = clampText(attrs.notes || attrs.notes_note, 800);
+  var combined = [place, street, attrs.use, attrs.meaning, attrs.joins_barrier, attrs.broad_type, notes].join(' ');
   if (hasSensitive(combined)) {
     return { status: 400, body: { ok: false, error: 'Please do not include precise wildlife locations (sett, den, nest, roost). Keep it street-level and general.' } };
   }
@@ -118,6 +119,7 @@ async function handleSubmission(body, ip, env) {
       feature_class: 'community_suggestion',
       status: 'pending_review',
       submitted_at: new Date().toISOString().slice(0, 19) + 'Z',
+      geometry_kind: geom.type === 'Point' ? 'marker' : 'area',
       place: place,
       street_area: street,
       broad_type: clampText(attrs.broad_type, 60),
@@ -125,6 +127,7 @@ async function handleSubmission(body, ip, env) {
       use_note: clampText(attrs.use, 500),
       meaning_note: clampText(attrs.meaning, 500),
       joins_barrier: clampText(attrs.joins_barrier, 300),
+      notes: notes,
       interested_in_helping: attrs.interested_in_helping === 'yes' ? 'yes' : (attrs.interested_in_helping === 'no' ? 'no' : ''),
       quote_ok: attrs.quote_ok === 'yes' ? 'yes' : (attrs.quote_ok === 'no' ? 'no' : ''),
       ip_hash: await hashIp(ip)
