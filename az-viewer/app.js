@@ -205,7 +205,7 @@
   }
 
   function loadParcels() {
-    return fetch('data/parcels-public.geojson?v=15').then(function (r) { return r.json(); }).then(function (fc) {
+    return fetch('data/parcels-public.geojson?v=16').then(function (r) { return r.json(); }).then(function (fc) {
       parcels = fc.features || [];
       var proposedSeq = buildProposedSeq(parcels);
       parcels.forEach(function (f) { f.properties = f.properties || {}; f.properties._label = displayLabel(f.properties, proposedSeq, null); });
@@ -226,8 +226,7 @@
             l.bindPopup(popupHtml(f.properties, lab));
             l.on('click', function (ev) { try { L.DomEvent.stopPropagation(ev); } catch(e){} showSelectedLabel(l, lab, cls); });
           }
-        });
-        if (cls !== 'amenity_water') groups[cls].addTo(map); // amenity_water off by default (695 features)
+        }).addTo(map);
       });
       injectHatchDefs();
       order.forEach(function (cls) { if (CLASS_META[cls] && CLASS_META[cls].hatch) applyHatch(groups[cls], cls); });
