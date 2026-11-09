@@ -209,7 +209,7 @@
   }
 
   function loadParcels() {
-    return fetch('data/parcels-public.geojson?v=16').then(function (r) { return r.json(); }).then(function (fc) {
+    return fetch('data/parcels-public.geojson?v=18').then(function (r) { return r.json(); }).then(function (fc) {
       parcels = fc.features || [];
       var proposedSeq = buildProposedSeq(parcels);
       parcels.forEach(function (f) { f.properties = f.properties || {}; f.properties._label = displayLabel(f.properties, proposedSeq, null); });
@@ -428,15 +428,19 @@
     var street = stripHouseNumberClient(streetRaw);
     var place = asciiVal(document.getElementById('c-place').value).trim();
     if (!street && !place) { setResult('Please add a street/area or a place name (no house numbers).', 'err'); return; }
+    var notesVal = asciiVal(document.getElementById('c-notes').value).trim();
+    var useVal = asciiVal(document.getElementById('c-use').value).trim();
+    // bridge: old deployed workers only store known fields; fold notes into 'use' for compatibility
+    var useCompat = notesVal ? (useVal ? (useVal + ' | Notes: ' + notesVal) : ('Notes: ' + notesVal)) : useVal;
     var attrs = {
       place: place,
       street: street,
       broad_type: asciiVal(document.getElementById('c-type').value),
       wildlife_tick: !!document.getElementById('c-wildlife').checked,
-      use: asciiVal(document.getElementById('c-use').value).trim(),
+      use: useCompat.slice(0, 500),
       meaning: asciiVal(document.getElementById('c-meaning').value).trim(),
       joins_barrier: asciiVal(document.getElementById('c-joins').value).trim(),
-      notes: asciiVal(document.getElementById('c-notes').value).trim(),
+      notes: notesVal,
       interested_in_helping: asciiVal(document.getElementById('c-help').value),
       quote_ok: asciiVal(document.getElementById('c-quote').value)
     };
