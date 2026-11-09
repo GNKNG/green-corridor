@@ -30,6 +30,7 @@ body { font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-se
 #draw-status.err { color: #a8452f; font-weight: 600; }
 #c-result.ok { color: #1f4a2c; font-weight: 600; }
 #c-result.err { color: #a8452f; font-weight: 600; }
+.draw-help { background: #fff; border: 1px solid #c4d3b8; border-radius: 4px; padding: 6px 8px; margin: 4px 0 6px; font-weight: 400; }
 #results li { padding: 6px 8px; cursor: pointer; border-bottom: 1px solid #e2ebd8; background: #fff8e1; border-left: 4px solid #f9a825; margin-bottom: 2px; font-weight: 600; }
 #results li.place { background: #e8f5e9; border-left-color: #1b7f3a; }
 #results li.parcel-hit { background: #fff8e1; border-left-color: #f9a825; }

@@ -87,8 +87,12 @@ async function handleSubmission(body, ip, env) {
   var place = clampText(attrs.place, 120);
   var street = stripHouseNumber(attrs.street || attrs.street_area || '');
   street = clampText(street, 120);
+  if (!place && !street) {
+    return { status: 400, body: { ok: false, error: 'Please add a place name or a street name (no house numbers).' } };
+  }
   var notes = clampText(attrs.notes || attrs.notes_note, 800);
-  var combined = [place, street, attrs.use, attrs.meaning, attrs.joins_barrier, attrs.broad_type, notes].join(' ');
+  var contact = clampText(attrs.contact, 200);
+  var combined = [place, street, attrs.broad_type, notes, contact].join(' ');
   if (hasSensitive(combined)) {
     return { status: 400, body: { ok: false, error: 'Please do not include precise wildlife locations (sett, den, nest, roost). Keep it street-level and general.' } };
   }
@@ -103,13 +107,8 @@ async function handleSubmission(body, ip, env) {
       place: place,
       street_area: street,
       broad_type: clampText(attrs.broad_type, 60),
-      wildlife_tick: !!attrs.wildlife_tick,
-      use_note: clampText(attrs.use, 500),
-      meaning_note: clampText(attrs.meaning, 500),
-      joins_barrier: clampText(attrs.joins_barrier, 300),
       notes: notes,
-      interested_in_helping: attrs.interested_in_helping === 'yes' ? 'yes' : (attrs.interested_in_helping === 'no' ? 'no' : ''),
-      quote_ok: attrs.quote_ok === 'yes' ? 'yes' : (attrs.quote_ok === 'no' ? 'no' : ''),
+      contact: contact,
       ip_hash: await hashIp(ip)
     }
   };

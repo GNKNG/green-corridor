@@ -6,7 +6,7 @@
 <title>Swindon green corridors - residents map (DRAFT)</title>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <link rel="stylesheet" href="https://unpkg.com/@geoman-io/leaflet-geoman-free@2.16.0/dist/leaflet-geoman.css">
-<link rel="stylesheet" href="style.css?v=18">
+<link rel="stylesheet" href="style.css?v=19">
 </head>
 <body>
 <header id="banner">
@@ -27,15 +27,22 @@
     <h2>Add a green space (indicative)</h2>
     <p class="sub">Draw an <strong>indicative</strong> area or marker on the map and tell us about it. Not a boundary, designation, survey, approval, or ownership claim. Submissions are reviewed before they appear. No email collected - to get in touch, use the <a href="https://gnkng.github.io/green-corridor/survey-swindon.html">contact/survey form</a>.</p>
     <div class="draw-controls">
-      <button type="button" id="draw-area" class="btn">Draw area (freehand)</button>
+      <button type="button" id="draw-area" class="btn">Draw area (polygon)</button>
       <button type="button" id="draw-marker" class="btn">Add marker (point/flag)</button>
       <button type="button" id="draw-clear" class="btn btn-muted">Clear drawing</button>
+      <button type="button" id="draw-help-btn" class="btn btn-muted">Help</button>
+    </div>
+    <div id="draw-help" class="sub draw-help" hidden>
+      <strong>How to draw (basic):</strong><br>
+      - <strong>Draw area (polygon):</strong> tap/click the map to add points around the area. To finish, double-click or tap the last point (or the first point) to close the shape.<br>
+      - <strong>Add marker (point/flag):</strong> tap/click the map once to place a marker.<br>
+      - You can <strong>Clear drawing</strong> and try again. Drawings are indicative only.
     </div>
     <p id="draw-status" class="sub" aria-live="polite">No drawing yet.</p>
     <form id="community-form" novalidate>
-      <label for="c-place">Place / name (optional)</label>
+      <label for="c-place">Place name (required, or give street name)</label>
       <input id="c-place" name="place" type="text" maxlength="120" autocomplete="off">
-      <label for="c-street">Street or area (no house numbers)</label>
+      <label for="c-street">Street name (alternative to place, no house numbers)</label>
       <input id="c-street" name="street" type="text" maxlength="120" autocomplete="off" placeholder="e.g. Queens Drive area">
       <label for="c-type">Broad type</label>
       <select id="c-type" name="broad_type">
@@ -48,27 +55,10 @@
         <option value="allotment_garden">Allotment / community garden</option>
         <option value="other">Other</option>
       </select>
-      <label class="check"><input id="c-wildlife" name="wildlife_tick" type="checkbox"> Wildlife seen here (general - no precise locations like sett/den/nest)</label>
-      <label for="c-use">How is it used?</label>
-      <textarea id="c-use" name="use" maxlength="500" rows="2"></textarea>
-      <label for="c-meaning">What does it mean to you / the area?</label>
-      <textarea id="c-meaning" name="meaning" maxlength="500" rows="2"></textarea>
-      <label for="c-joins">Does it join places or act as a barrier?</label>
-      <input id="c-joins" name="joins_barrier" type="text" maxlength="300" autocomplete="off">
-      <label for="c-notes">Notes (optional, free text)</label>
-      <textarea id="c-notes" name="notes" maxlength="800" rows="2"></textarea>
-      <label for="c-help">Interested in helping? (optional)</label>
-      <select id="c-help" name="interested_in_helping">
-        <option value="">Prefer not to say</option>
-        <option value="yes">Yes</option>
-        <option value="no">No</option>
-      </select>
-      <label for="c-quote">Happy to be quoted (anonymously, if shared)?</label>
-      <select id="c-quote" name="quote_ok">
-        <option value="">Prefer not to say</option>
-        <option value="yes">Yes</option>
-        <option value="no">No</option>
-      </select>
+      <label for="c-notes">Comments (optional, free text)</label>
+      <textarea id="c-notes" name="notes" maxlength="800" rows="3"></textarea>
+      <label for="c-contact">Contact (optional, anything or nothing)</label>
+      <input id="c-contact" name="contact" type="text" maxlength="200" autocomplete="off">
       <input id="c-website" name="website" type="text" tabindex="-1" autocomplete="off" class="hp" aria-hidden="true">
       <button type="submit" id="c-submit" class="btn btn-primary">Send for review</button>
     </form>
@@ -86,6 +76,6 @@
 <script>window.COMMUNITY_SUBMIT_URL = 'https://twilight-violet-8787.danmillerarchaeology.workers.dev';</script>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://unpkg.com/@geoman-io/leaflet-geoman-free@2.16.0/dist/leaflet-geoman.min.js"></script>
-<script src="app.js?v=18"></script>
+<script src="app.js?v=19"></script>
 </body>
 </html>

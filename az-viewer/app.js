@@ -167,13 +167,10 @@
   function communityPopupHtml(p, lab) {
     var rows = [];
     if (p.place) rows.push('Place: ' + esc(p.place));
-    if (p.street_area) rows.push('Area: ' + esc(p.street_area));
+    if (p.street_area) rows.push('Street/area: ' + esc(p.street_area));
     if (p.broad_type) rows.push('Type: ' + esc(p.broad_type));
-    if (p.wildlife_tick) rows.push('Wildlife noted (general)');
-    if (p.use_note) rows.push('Use: ' + esc(p.use_note));
-    if (p.meaning_note) rows.push('Meaning: ' + esc(p.meaning_note));
-    if (p.joins_barrier) rows.push('Joins/barrier: ' + esc(p.joins_barrier));
-    if (p.notes || p.notes_note) rows.push('Notes: ' + esc(p.notes || p.notes_note));
+    if (p.notes || p.notes_note) rows.push('Comments: ' + esc(p.notes || p.notes_note));
+    if (p.contact) rows.push('Contact: ' + esc(p.contact));
     return '<strong>' + esc(lab) + '</strong> <span style="color:#666">(community)</span><br>' +
       'Type: ' + esc(CLASS_META.community_suggestion.label) + '<br>' +
       (rows.length ? rows.join('<br>') + '<br>' : '') +
@@ -182,13 +179,10 @@
   function myPendingPopupHtml(p, lab) {
     var rows = [];
     if (p.place) rows.push('Place: ' + esc(p.place));
-    if (p.street_area || p.street) rows.push('Area: ' + esc(p.street_area || p.street));
+    if (p.street_area || p.street) rows.push('Street/area: ' + esc(p.street_area || p.street));
     if (p.broad_type) rows.push('Type: ' + esc(p.broad_type));
-    if (p.wildlife_tick) rows.push('Wildlife noted (general)');
-    if (p.use_note || p.use) rows.push('Use: ' + esc(p.use_note || p.use));
-    if (p.meaning_note || p.meaning) rows.push('Meaning: ' + esc(p.meaning_note || p.meaning));
-    if (p.joins_barrier) rows.push('Joins/barrier: ' + esc(p.joins_barrier));
-    if (p.notes || p.notes_note) rows.push('Notes: ' + esc(p.notes || p.notes_note));
+    if (p.notes || p.notes_note) rows.push('Comments: ' + esc(p.notes || p.notes_note));
+    if (p.contact) rows.push('Contact: ' + esc(p.contact));
     return '<strong>' + esc(lab) + '</strong> <span style="color:#666">(pending)</span><br>' +
       'Type: ' + esc(CLASS_META.my_pending.label) + '<br>' +
       (rows.length ? rows.join('<br>') + '<br>' : '') +
@@ -399,6 +393,9 @@
   var btnArea = document.getElementById('draw-area');
   var btnMarker = document.getElementById('draw-marker');
   var btnClear = document.getElementById('draw-clear');
+  var btnHelp = document.getElementById('draw-help-btn');
+  var helpBox = document.getElementById('draw-help');
+  if (btnHelp && helpBox) btnHelp.onclick = function () { helpBox.hidden = !helpBox.hidden; };
   if (btnArea) btnArea.onclick = function () {
     setResult('');
     if (!map.pm) { setDrawStatus('Drawing tool not available. Please use the contact form.', 'err'); return; }
@@ -427,24 +424,17 @@
     var streetRaw = asciiVal(document.getElementById('c-street').value);
     var street = stripHouseNumberClient(streetRaw);
     var place = asciiVal(document.getElementById('c-place').value).trim();
-    if (!street && !place) { setResult('Please add a street/area or a place name (no house numbers).', 'err'); return; }
+    if (!street && !place) { setResult('Please add a place name or a street name (no house numbers).', 'err'); return; }
     var notesVal = asciiVal(document.getElementById('c-notes').value).trim();
-    var useVal = asciiVal(document.getElementById('c-use').value).trim();
-    // bridge: old deployed workers only store known fields; fold notes into 'use' for compatibility
-    var useCompat = notesVal ? (useVal ? (useVal + ' | Notes: ' + notesVal) : ('Notes: ' + notesVal)) : useVal;
+    var contactVal = asciiVal(document.getElementById('c-contact').value).trim();
     var attrs = {
       place: place,
       street: street,
       broad_type: asciiVal(document.getElementById('c-type').value),
-      wildlife_tick: !!document.getElementById('c-wildlife').checked,
-      use: useCompat.slice(0, 500),
-      meaning: asciiVal(document.getElementById('c-meaning').value).trim(),
-      joins_barrier: asciiVal(document.getElementById('c-joins').value).trim(),
       notes: notesVal,
-      interested_in_helping: asciiVal(document.getElementById('c-help').value),
-      quote_ok: asciiVal(document.getElementById('c-quote').value)
+      contact: contactVal
     };
-    if (hasSensitiveClient([place, street, attrs.use, attrs.meaning, attrs.joins_barrier, attrs.notes].join(' '))) {
+    if (hasSensitiveClient([place, street, notesVal, contactVal].join(' '))) {
       setResult('Please do not include precise wildlife locations (sett, den, nest, roost). Keep it street-level and general.', 'err');
       return;
     }
