@@ -28,3 +28,7 @@ body { font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-se
 .ph { font-style: italic; color: #4c5c46; }
 .leaflet-popup-content { font-size: 12.5px; }
 .leaflet-popup-content strong { color: #1f4a2c; }
+.feat-label { background: rgba(255,255,255,0.82); border: 1px solid rgba(0,0,0,0.35); border-radius: 3px; box-shadow: 0 1px 2px rgba(0,0,0,0.2); color: #111; font-size: 12px; font-weight: 700; padding: 0 3px; line-height: 1.2; pointer-events: none; white-space: nowrap; }
+.feat-label.feat-en1_green_corridor { border-color: #1B7F3A; }
+.feat-label.feat-proposed_new_areas { border-color: #C77700; }
+.feat-label.feat-amenity_water { border-color: #1565C0; font-size: 10px; font-weight: 600; }

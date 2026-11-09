@@ -3,35 +3,35 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Swindon green spaces - residents map (DRAFT)</title>
+<title>Swindon green corridors - residents map (DRAFT)</title>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
-<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="style.css?v=8">
 </head>
 <body>
 <header id="banner">
   <strong>DRAFT / NOTHING FILED.</strong>
-  Indicative only, not a legal boundary. Adopted EN1 context only, not the emerging Reg 19 layer.
-  Constable Road SN2 7JF is a separate case.
+  Indicative only, not a legal boundary. Not a designation, survey, approval, ownership, or group claim.
+  Adopted EN1 = policy context; proposed/emerging areas are draft and indicative only.
   <span id="banner-date">Data date: 2026-11-08</span>
 </header>
 <div id="layout">
   <button id="panel-toggle" aria-label="Hide panel">✕ Hide panel</button>
   <aside id="panel">
-    <h1>Swindon green spaces - residents map</h1>
-    <p class="sub">Draft borough overview. Are groups or parishes already working on these areas?</p>
-    <label for="search">Find a Swindon street, postcode, or place (map moves there either way):</label>
-    <input id="search" type="text" placeholder="e.g. SN2 7JF, Constable Road, Seven Fields" autocomplete="off">
+    <h1>Swindon green corridors - residents map</h1>
+    <p class="sub">Draft borough overview (A-Z layers). Labels: EN1 = corridor number (XX), proposed = pN. Are groups or parishes already working on these areas?</p>
+    <label for="search">Find a Swindon street, postcode, place, or parcel label (map moves there):</label>
+    <input id="search" type="text" placeholder="e.g. SN2 7JF, a street name, 23, p12" autocomplete="off">
     <ul id="results"></ul>
-    <h2>Parcels (<span id="count">0</span>)</h2>
+    <h2>Parcels/features (<span id="count">0</span>)</h2>
     <ul id="parcel-list"></ul>
     <h2>About</h2>
-    <p>The map shows adopted EN1 green corridors as context. The proposed (emerging) Local Plan map is not yet adopted. Not seeing a place here does not by itself settle its status. That is for the Council to check.</p>
+    <p>Layers (toggle on map): adopted EN1 green corridors (policy context) and proposed new areas (DRAFT / indicative, emerging context). Amenity water shown indicatively where published. The emerging Local Plan/proposed map is not adopted. Not seeing a place here does not by itself settle its status.</p>
     <p>Contact: <a href="https://gnkng.github.io/green-corridor/survey-swindon.html">survey form</a>. Full map: <a href="https://gnkng.github.io/green-corridor/az-viewer/">az-viewer (2026-11-08)</a>. Facebook: <a href="https://www.facebook.com/swindon.green.spaces">Swindon green spaces</a>.</p>
     <p><a href="https://consultations.swindon.gov.uk/publication-stage-swindon-local-plan-2043">Council Reg 19 hub (formal route only)</a></p>
   </aside>
   <div id="map"></div>
 </div>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="app.js?v=7"></script>
+<script src="app.js?v=8"></script>
 </body>
 </html>
