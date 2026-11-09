@@ -41,19 +41,12 @@
     });
     return seq;
   }
-  function buildCommunitySeq(features) {
-    var seq = {}, n = 0;
-    (features || []).forEach(function (f) {
-      var p = f.properties || {};
-      if (p.feature_class === 'community_suggestion') { n += 1; var k = p.id != null ? String(p.id) : ('i' + n); seq[k] = n; seq['__i' + (n - 1)] = n; }
-    });
-    return seq;
-  }
   function displayLabel(props, proposedSeq, communityIndex) {
     var p = props || {}, fc = p.feature_class || '';
     var official = ['en_number','designation_ref','official_designation','ref'];
     var generic = ['display_name','short_label','name'];
     var i, v;
+    if (fc === 'my_pending') return 'P' + (communityIndex != null ? communityIndex : '?');
     if (fc === 'community_suggestion') {
       if (p.map_label) return String(p.map_label);
       if (communityIndex != null) return 'C' + communityIndex;
@@ -78,7 +71,8 @@
     en1_green_corridor: { label: 'Adopted EN1 green corridor (policy context)', color: '#1B7F3A', fill: '#27AE60', weight: 3, dash: '8 5', fillOpacity: 0, hatch: 'hatch-en1' },
     proposed_new_areas: { label: 'Proposed new area (DRAFT / indicative)', color: '#C77700', fill: '#F9A825', weight: 3, dash: null, fillOpacity: 0, hatch: 'hatch-proposed' },
     amenity_water:      { label: 'Amenity water (indicative)', color: '#1565C0', fill: '#42A5F5', weight: 2, dash: null, fillOpacity: 0.28, hatch: null },
-    community_suggestion: { label: 'Community suggestion (indicative, reviewed)', color: '#6A1B9A', fill: '#BA68C8', weight: 2, dash: '4 4', fillOpacity: 0.18, hatch: null }
+    community_suggestion: { label: 'Community suggestion (indicative, reviewed)', color: '#6A1B9A', fill: '#BA68C8', weight: 2, dash: '4 4', fillOpacity: 0.18, hatch: null },
+    my_pending: { label: 'My pending suggestion (local, awaiting review)', color: '#455A64', fill: '#90A4AE', weight: 2, dash: '6 4', fillOpacity: 0.2, hatch: null }
   };
 
   function injectHatchDefs() {
@@ -117,6 +111,40 @@
   var groups = {};
   var foundMarker = null;
   var overlays = {};
+  var layersControl = null;
+  var myPendingLayer = L.layerGroup();
+
+  var LOCAL_KEY = 'gc_pending_v1';
+  function loadLocalPending() {
+    try { var raw = localStorage.getItem(LOCAL_KEY); var arr = raw ? JSON.parse(raw) : []; return Array.isArray(arr) ? arr : []; } catch (e) { return []; }
+  }
+  function saveLocalPending(arr) {
+    try { localStorage.setItem(LOCAL_KEY, JSON.stringify(arr || [])); } catch (e) {}
+  }
+  function renderMyPending() {
+    try { myPendingLayer.clearLayers(); } catch (e) {}
+    var items = loadLocalPending();
+    var meta = CLASS_META.my_pending;
+    var n = 0;
+    items.forEach(function (it) {
+      if (!it || !it.geometry) return;
+      n += 1;
+      var p = it.properties || {};
+      p.feature_class = 'my_pending';
+      var lab = 'P' + n;
+      var feat = { type: 'Feature', geometry: it.geometry, properties: p };
+      var g = L.geoJSON(feat, {
+        style: function () { return { color: meta.color, weight: meta.weight, dashArray: meta.dash, fillColor: meta.fill, fillOpacity: meta.fillOpacity, opacity: 0.95 }; },
+        pointToLayer: function (f, latlng) { return L.circleMarker(latlng, { radius: 7, color: meta.color, fillColor: meta.fill, fillOpacity: 0.7, weight: 2 }); },
+        onEachFeature: function (f, l) {
+          l.bindPopup(popupHtml(f.properties, lab));
+          l.bindTooltip(String(lab), { permanent: true, direction: 'center', className: 'feat-label feat-my_pending' });
+        }
+      });
+      g.eachLayer(function (l) { myPendingLayer.addLayer(l); });
+    });
+    return n;
+  }
 
   function communityPopupHtml(p, lab) {
     var rows = [];
@@ -132,8 +160,21 @@
       (rows.length ? rows.join('<br>') + '<br>' : '') +
       '<em>Community indicative sketch - not a boundary, designation, survey, approval, or ownership claim.</em>';
   }
+  function myPendingPopupHtml(p, lab) {
+    var rows = [];
+    if (p.place) rows.push('Place: ' + esc(p.place));
+    if (p.street_area || p.street) rows.push('Area: ' + esc(p.street_area || p.street));
+    if (p.broad_type) rows.push('Type: ' + esc(p.broad_type));
+    if (p.wildlife_tick) rows.push('Wildlife noted (general)');
+    if (p.use_note) rows.push('Use: ' + esc(p.use_note));
+    return '<strong>' + esc(lab) + '</strong> <span style="color:#666">(pending)</span><br>' +
+      'Type: ' + esc(CLASS_META.my_pending.label) + '<br>' +
+      (rows.length ? rows.join('<br>') + '<br>' : '') +
+      '<em>Queued for review - only visible on this device until approved. Indicative only, not a boundary/designation/ownership claim.</em>';
+  }
 
   function popupHtml(p, lab) {
+    if (p.feature_class === 'my_pending') return myPendingPopupHtml(p, lab);
     if (p.feature_class === 'community_suggestion') return communityPopupHtml(p, lab);
     var meta = CLASS_META[p.feature_class] || { label: p.feature_class || '' };
     return '<strong>' + esc(lab) + '</strong>' +
@@ -216,14 +257,17 @@
         }
       });
       // off by default (user toggles on); listed last
-      overlays['Community suggestions - indicative (' + feats.length + ')'] = layer;
+      overlays['Community suggestions - indicative (approved)'] = layer;
     }).catch(function () {
-      overlays['Community suggestions - indicative (0)'] = L.layerGroup();
+      overlays['Community suggestions - indicative (approved)'] = L.layerGroup();
     });
   }
 
   loadParcels().then(function () { return loadCommunity(); }).catch(function () { return loadCommunity(); }).then(function () {
-    L.control.layers(null, overlays, { collapsed: window.innerWidth < 700 }).addTo(map);
+    renderMyPending();
+    overlays['My pending (local, awaiting review)'] = myPendingLayer;
+    myPendingLayer.addTo(map); // keep visible locally so it does not disappear
+    layersControl = L.control.layers(null, overlays, { collapsed: window.innerWidth < 700 }).addTo(map);
   }).catch(function () {
     var c = document.getElementById('count'); if (c) c.textContent = 'load error';
   });
@@ -395,7 +439,12 @@
       .then(function (res) {
         var msg = (res.data && (res.data.message || res.data.error)) || '';
         if (res.ok && res.data && res.data.ok) {
-          setResult(msg || 'Thank you. Your suggestion was queued for review before it appears on the map.', 'ok');
+          var pending = loadLocalPending();
+          pending.push({ geometry: geom, properties: attrs, submitted_at: new Date().toISOString() });
+          saveLocalPending(pending);
+          renderMyPending();
+          try { if (!map.hasLayer(myPendingLayer)) myPendingLayer.addTo(map); } catch (e) {}
+          setResult((msg || 'Thank you. Your suggestion was queued for review.') + ' It stays visible here on this device (P) until approved publicly.', 'ok');
           form.reset();
           clearDrawing();
         } else {
