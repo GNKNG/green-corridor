@@ -12,8 +12,9 @@
   };
 
   var map = L.map('map').setView([51.568, -1.78], 11);
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    maxZoom: 19, attribution: 'OpenStreetMap contributors'
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png', {
+    maxZoom: 19, subdomains: 'abcd',
+    attribution: '&copy; OpenStreetMap contributors &copy; CARTO'
   }).addTo(map);
 
   function esc(s) { return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
