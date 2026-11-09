@@ -14,8 +14,22 @@ body { font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-se
 #panel h2 { font-size: 13px; color: #1f4a2c; margin: 12px 0 4px; text-transform: uppercase; letter-spacing: .05em; }
 #panel .sub { font-size: 12.5px; color: #4c5c46; margin-bottom: 10px; }
 #panel p { font-size: 12.5px; margin-bottom: 8px; }
-#panel label { font-size: 12px; font-weight: 600; }
-#search { width: 100%; padding: 6px 8px; margin: 4px 0 6px; border: 1px solid #4e7a45; border-radius: 4px; font-size: 13px; }
+#panel label { font-size: 12px; font-weight: 600; display: block; margin-top: 6px; }
+#search, #community-form input[type=text], #community-form textarea, #community-form select { width: 100%; padding: 6px 8px; margin: 3px 0 2px; border: 1px solid #4e7a45; border-radius: 4px; font-size: 13px; font-family: inherit; }
+#community-form textarea { resize: vertical; }
+#community-form .check { font-weight: 400; display: flex; gap: 6px; align-items: flex-start; }
+#community-form .check input { width: auto; margin-top: 2px; }
+.hp { position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0; }
+.draw-controls { display: flex; flex-wrap: wrap; gap: 6px; margin: 6px 0; }
+.btn { background: #e8f0e2; color: #1f4a2c; border: 1px solid #4e7a45; border-radius: 4px; padding: 6px 8px; font-size: 12px; font-weight: 600; cursor: pointer; }
+.btn:hover { background: #d6e6cc; }
+.btn-primary { background: #1f4a2c; color: #f2efe2; border-color: #1f4a2c; width: 100%; margin-top: 8px; padding: 8px; }
+.btn-primary:hover { background: #2f6b42; }
+.btn-muted { background: #f3efe3; color: #4c5c46; }
+#draw-status.ok { color: #1f4a2c; font-weight: 600; }
+#draw-status.err { color: #a8452f; font-weight: 600; }
+#c-result.ok { color: #1f4a2c; font-weight: 600; }
+#c-result.err { color: #a8452f; font-weight: 600; }
 #results li { padding: 6px 8px; cursor: pointer; border-bottom: 1px solid #e2ebd8; background: #fff8e1; border-left: 4px solid #f9a825; margin-bottom: 2px; font-weight: 600; }
 #results li.place { background: #e8f5e9; border-left-color: #1b7f3a; }
 #results li.parcel-hit { background: #fff8e1; border-left-color: #f9a825; }
@@ -32,3 +46,4 @@ body { font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-se
 .feat-label.feat-en1_green_corridor { border-color: #1B7F3A; }
 .feat-label.feat-proposed_new_areas { border-color: #C77700; }
 .feat-label.feat-amenity_water { border-color: #1565C0; font-size: 10px; font-weight: 600; }
+.feat-label.feat-community_suggestion { border-color: #6A1B9A; color: #4A148C; }

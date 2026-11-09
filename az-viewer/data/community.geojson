@@ -1,0 +1,10 @@
+{
+  "type": "FeatureCollection",
+  "name": "community_approved",
+  "properties": {
+    "note": "Approved community suggestions only. Loaded by the read-only viewer. Submissions are moderated before appearing here.",
+    "date": "2026-11-09",
+    "status": "approved-only"
+  },
+  "features": []
+}

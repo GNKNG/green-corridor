@@ -5,7 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Swindon green corridors - residents map (DRAFT)</title>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
-<link rel="stylesheet" href="style.css?v=8">
+<link rel="stylesheet" href="https://unpkg.com/@geoman-io/leaflet-geoman-free@2.16.0/dist/leaflet-geoman.css">
+<link rel="stylesheet" href="style.css?v=9">
 </head>
 <body>
 <header id="banner">
@@ -15,23 +16,74 @@
   <span id="banner-date">Data date: 2026-11-08</span>
 </header>
 <div id="layout">
-  <button id="panel-toggle" aria-label="Hide panel">✕ Hide panel</button>
+  <button id="panel-toggle" aria-label="Hide panel">Hide panel</button>
   <aside id="panel">
     <h1>Swindon green corridors - residents map</h1>
     <p class="sub">Draft borough overview (A-Z layers). Labels: EN1 = corridor number (XX), proposed = pN. Are groups or parishes already working on these areas?</p>
     <label for="search">Find a Swindon street, postcode, place, or parcel label (map moves there):</label>
     <input id="search" type="text" placeholder="e.g. SN2 7JF, a street name, 23, p12" autocomplete="off">
     <ul id="results"></ul>
+
+    <h2>Add a green space (indicative)</h2>
+    <p class="sub">Draw an <strong>indicative</strong> area or marker on the map and tell us about it. Not a boundary, designation, survey, approval, or ownership claim. Submissions are reviewed before they appear. No email collected - to get in touch, use the <a href="https://gnkng.github.io/green-corridor/survey-swindon.html">contact/survey form</a>.</p>
+    <div class="draw-controls">
+      <button type="button" id="draw-area" class="btn">Draw area (freehand)</button>
+      <button type="button" id="draw-marker" class="btn">Add marker</button>
+      <button type="button" id="draw-clear" class="btn btn-muted">Clear drawing</button>
+    </div>
+    <p id="draw-status" class="sub" aria-live="polite">No drawing yet.</p>
+    <form id="community-form" novalidate>
+      <label for="c-place">Place / name (optional)</label>
+      <input id="c-place" name="place" type="text" maxlength="120" autocomplete="off">
+      <label for="c-street">Street or area (no house numbers)</label>
+      <input id="c-street" name="street" type="text" maxlength="120" autocomplete="off" placeholder="e.g. Queens Drive area">
+      <label for="c-type">Broad type</label>
+      <select id="c-type" name="broad_type">
+        <option value="">Select (optional)</option>
+        <option value="green_corridor">Green corridor / link</option>
+        <option value="park_open_space">Park / open space</option>
+        <option value="woodland">Woodland / trees</option>
+        <option value="grassland">Grassland / verge</option>
+        <option value="water">Water / pond / stream</option>
+        <option value="allotment_garden">Allotment / community garden</option>
+        <option value="other">Other</option>
+      </select>
+      <label class="check"><input id="c-wildlife" name="wildlife_tick" type="checkbox"> Wildlife seen here (general - no precise locations like sett/den/nest)</label>
+      <label for="c-use">How is it used?</label>
+      <textarea id="c-use" name="use" maxlength="500" rows="2"></textarea>
+      <label for="c-meaning">What does it mean to you / the area?</label>
+      <textarea id="c-meaning" name="meaning" maxlength="500" rows="2"></textarea>
+      <label for="c-joins">Does it join places or act as a barrier?</label>
+      <input id="c-joins" name="joins_barrier" type="text" maxlength="300" autocomplete="off">
+      <label for="c-help">Interested in helping? (optional)</label>
+      <select id="c-help" name="interested_in_helping">
+        <option value="">Prefer not to say</option>
+        <option value="yes">Yes</option>
+        <option value="no">No</option>
+      </select>
+      <label for="c-quote">Happy to be quoted (anonymously, if shared)?</label>
+      <select id="c-quote" name="quote_ok">
+        <option value="">Prefer not to say</option>
+        <option value="yes">Yes</option>
+        <option value="no">No</option>
+      </select>
+      <input id="c-website" name="website" type="text" tabindex="-1" autocomplete="off" class="hp" aria-hidden="true">
+      <button type="submit" id="c-submit" class="btn btn-primary">Send for review</button>
+    </form>
+    <p id="c-result" class="sub" aria-live="polite"></p>
+
     <h2>Parcels/features (<span id="count">0</span>)</h2>
     <ul id="parcel-list"></ul>
     <h2>About</h2>
-    <p>Layers (toggle on map): adopted EN1 green corridors (policy context) and proposed new areas (DRAFT / indicative, emerging context). Amenity water shown indicatively where published. The emerging Local Plan/proposed map is not adopted. Not seeing a place here does not by itself settle its status.</p>
-    <p>Contact: <a href="https://gnkng.github.io/green-corridor/survey-swindon.html">survey form</a>. Full map: <a href="https://gnkng.github.io/green-corridor/az-viewer/">az-viewer (2026-11-08)</a>. Facebook: <a href="https://www.facebook.com/swindon.green.spaces">Swindon green spaces</a>.</p>
+    <p>Layers (toggle on map): adopted EN1 green corridors (policy context), proposed new areas (DRAFT / indicative, emerging context), amenity water (indicative), and approved community suggestions (indicative, reviewed). The emerging Local Plan/proposed map is not adopted. Not seeing a place here does not by itself settle its status.</p>
+    <p>Contact: <a href="https://gnkng.github.io/green-corridor/survey-swindon.html">survey/contact form</a>. Full map: <a href="https://gnkng.github.io/green-corridor/az-viewer/">az-viewer</a>. Facebook: <a href="https://www.facebook.com/swindon.green.spaces">Swindon green spaces</a>.</p>
     <p><a href="https://consultations.swindon.gov.uk/publication-stage-swindon-local-plan-2043">Council Reg 19 hub (formal route only)</a></p>
   </aside>
   <div id="map"></div>
 </div>
+<script>window.COMMUNITY_SUBMIT_URL = window.COMMUNITY_SUBMIT_URL || '';</script>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="app.js?v=8"></script>
+<script src="https://unpkg.com/@geoman-io/leaflet-geoman-free@2.16.0/dist/leaflet-geoman.min.js"></script>
+<script src="app.js?v=9"></script>
 </body>
 </html>

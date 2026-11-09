@@ -1,4 +1,4 @@
-/* Read-only A-Z viewer. No editing, no backend, no login. Layers/labels aligned with A-Z product. */
+/* Read-only A-Z viewer + community suggestions (indicative). No backend in page, no login. */
 (function () {
   var layout = document.getElementById('layout');
   var toggle = document.getElementById('panel-toggle');
@@ -41,11 +41,24 @@
     });
     return seq;
   }
-  function displayLabel(props, proposedSeq) {
+  function buildCommunitySeq(features) {
+    var seq = {}, n = 0;
+    (features || []).forEach(function (f) {
+      var p = f.properties || {};
+      if (p.feature_class === 'community_suggestion') { n += 1; var k = p.id != null ? String(p.id) : ('i' + n); seq[k] = n; seq['__i' + (n - 1)] = n; }
+    });
+    return seq;
+  }
+  function displayLabel(props, proposedSeq, communityIndex) {
     var p = props || {}, fc = p.feature_class || '';
     var official = ['en_number','designation_ref','official_designation','ref'];
     var generic = ['display_name','short_label','name'];
     var i, v;
+    if (fc === 'community_suggestion') {
+      if (p.map_label) return String(p.map_label);
+      if (communityIndex != null) return 'C' + communityIndex;
+      return 'C?';
+    }
     if (fc === 'proposed_new_areas') {
       for (i=0;i<official.length;i++){ v=nonempty(p[official[i]]); if(v) return v; }
       var pn = proposedSeq && proposedSeq[String(p.id)];
@@ -64,7 +77,8 @@
   var CLASS_META = {
     en1_green_corridor: { label: 'Adopted EN1 green corridor (policy context)', color: '#1B7F3A', fill: '#27AE60', weight: 3, dash: '8 5', fillOpacity: 0, hatch: 'hatch-en1' },
     proposed_new_areas: { label: 'Proposed new area (DRAFT / indicative)', color: '#C77700', fill: '#F9A825', weight: 3, dash: null, fillOpacity: 0, hatch: 'hatch-proposed' },
-    amenity_water:      { label: 'Amenity water (indicative)', color: '#1565C0', fill: '#42A5F5', weight: 2, dash: null, fillOpacity: 0.28, hatch: null }
+    amenity_water:      { label: 'Amenity water (indicative)', color: '#1565C0', fill: '#42A5F5', weight: 2, dash: null, fillOpacity: 0.28, hatch: null },
+    community_suggestion: { label: 'Community suggestion (indicative, reviewed)', color: '#6A1B9A', fill: '#BA68C8', weight: 2, dash: '4 4', fillOpacity: 0.18, hatch: null }
   };
 
   function injectHatchDefs() {
@@ -101,10 +115,26 @@
 
   var parcels = [];
   var groups = {};
-  var groupLayers = {};
   var foundMarker = null;
+  var overlays = {};
+
+  function communityPopupHtml(p, lab) {
+    var rows = [];
+    if (p.place) rows.push('Place: ' + esc(p.place));
+    if (p.street_area) rows.push('Area: ' + esc(p.street_area));
+    if (p.broad_type) rows.push('Type: ' + esc(p.broad_type));
+    if (p.wildlife_tick) rows.push('Wildlife noted (general)');
+    if (p.use_note) rows.push('Use: ' + esc(p.use_note));
+    if (p.meaning_note) rows.push('Meaning: ' + esc(p.meaning_note));
+    if (p.joins_barrier) rows.push('Joins/barrier: ' + esc(p.joins_barrier));
+    return '<strong>' + esc(lab) + '</strong> <span style="color:#666">(community)</span><br>' +
+      'Type: ' + esc(CLASS_META.community_suggestion.label) + '<br>' +
+      (rows.length ? rows.join('<br>') + '<br>' : '') +
+      '<em>Community indicative sketch - not a boundary, designation, survey, approval, or ownership claim.</em>';
+  }
 
   function popupHtml(p, lab) {
+    if (p.feature_class === 'community_suggestion') return communityPopupHtml(p, lab);
     var meta = CLASS_META[p.feature_class] || { label: p.feature_class || '' };
     return '<strong>' + esc(lab) + '</strong>' +
       ' <span style="color:#666">(' + esc(p.id) + ')</span><br>' +
@@ -115,54 +145,86 @@
       '<em>DRAFT / NOTHING FILED. Indicative only, not a legal boundary.</em>';
   }
 
-  fetch('data/parcels-public.geojson').then(function (r) { return r.json(); }).then(function (fc) {
-    parcels = fc.features || [];
-    var proposedSeq = buildProposedSeq(parcels);
-    parcels.forEach(function (f) { f.properties = f.properties || {}; f.properties._label = displayLabel(f.properties, proposedSeq); });
-    document.getElementById('count').textContent = parcels.length;
+  function loadParcels() {
+    return fetch('data/parcels-public.geojson').then(function (r) { return r.json(); }).then(function (fc) {
+      parcels = fc.features || [];
+      var proposedSeq = buildProposedSeq(parcels);
+      parcels.forEach(function (f) { f.properties = f.properties || {}; f.properties._label = displayLabel(f.properties, proposedSeq, null); });
+      document.getElementById('count').textContent = parcels.length;
 
-    var order = ['en1_green_corridor','proposed_new_areas','amenity_water'];
-    order.forEach(function (cls) {
-      var meta = CLASS_META[cls] || { color:'#607D8B', weight:2, fillOpacity:0.15 };
-      groups[cls] = L.geoJSON({type:'FeatureCollection', features: parcels.filter(function(f){return (f.properties.feature_class||'')===cls;})}, {
-        style: function () {
-          var s = { color: meta.color, weight: meta.weight, fillColor: meta.fill || meta.color, fillOpacity: meta.hatch ? 0.001 : (meta.fillOpacity != null ? meta.fillOpacity : 0.1), opacity: 0.95 };
-          if (meta.dash) s.dashArray = meta.dash;
-          return s;
-        },
-        onEachFeature: function (f, l) {
-          var lab = f.properties._label || f.properties.id;
-          l.bindPopup(popupHtml(f.properties, lab));
-          l.bindTooltip(String(lab), { permanent: true, direction: 'center', className: 'feat-label feat-' + cls });
-        }
-      }).addTo(map);
-    });
-    injectHatchDefs();
-    order.forEach(function (cls) { if (CLASS_META[cls] && CLASS_META[cls].hatch) applyHatch(groups[cls], cls); });
-
-    var overlays = {};
-    overlays['Adopted EN1 green corridors (' + (groups.en1_green_corridor ? groups.en1_green_corridor.getLayers().length : 0) + ')'] = groups.en1_green_corridor;
-    overlays['Proposed new areas - draft (' + (groups.proposed_new_areas ? groups.proposed_new_areas.getLayers().length : 0) + ')'] = groups.proposed_new_areas;
-    overlays['Amenity water (' + (groups.amenity_water ? groups.amenity_water.getLayers().length : 0) + ')'] = groups.amenity_water;
-    L.control.layers(null, overlays, { collapsed: window.innerWidth < 700 }).addTo(map);
-
-    try {
-      var all = L.featureGroup(order.map(function(c){return groups[c];}).filter(Boolean));
-      map.fitBounds(all.getBounds());
-    } catch (e) {}
-
-    var list = document.getElementById('parcel-list');
-    if (list) {
-      list.innerHTML = '';
-      parcels.forEach(function (f) {
-        var li = document.createElement('li');
-        var lab = f.properties._label || f.properties.id;
-        li.textContent = lab + ' \u2014 ' + ((CLASS_META[f.properties.feature_class]||{}).label || f.properties.feature_class || '');
-        li.onclick = function () { try { var b = L.geoJSON(f.geometry).getBounds(); map.fitBounds(b.pad(0.5)); } catch(e){} };
-        list.appendChild(li);
+      var order = ['en1_green_corridor','proposed_new_areas','amenity_water'];
+      order.forEach(function (cls) {
+        var meta = CLASS_META[cls] || { color:'#607D8B', weight:2, fillOpacity:0.15 };
+        groups[cls] = L.geoJSON({type:'FeatureCollection', features: parcels.filter(function(f){return (f.properties.feature_class||'')===cls;})}, {
+          style: function () {
+            var s = { color: meta.color, weight: meta.weight, fillColor: meta.fill || meta.color, fillOpacity: meta.hatch ? 0.001 : (meta.fillOpacity != null ? meta.fillOpacity : 0.1), opacity: 0.95 };
+            if (meta.dash) s.dashArray = meta.dash;
+            return s;
+          },
+          pointToLayer: function (f, latlng) { return L.circleMarker(latlng, { radius: 5, color: meta.color, fillColor: meta.fill || meta.color, fillOpacity: 0.7, weight: 2 }); },
+          onEachFeature: function (f, l) {
+            var lab = f.properties._label || f.properties.id;
+            l.bindPopup(popupHtml(f.properties, lab));
+            l.bindTooltip(String(lab), { permanent: true, direction: 'center', className: 'feat-label feat-' + cls });
+          }
+        }).addTo(map);
       });
-    }
-  }).catch(function (e) {
+      injectHatchDefs();
+      order.forEach(function (cls) { if (CLASS_META[cls] && CLASS_META[cls].hatch) applyHatch(groups[cls], cls); });
+
+      overlays['Adopted EN1 green corridors (' + (groups.en1_green_corridor ? groups.en1_green_corridor.getLayers().length : 0) + ')'] = groups.en1_green_corridor;
+      overlays['Proposed new areas - draft (' + (groups.proposed_new_areas ? groups.proposed_new_areas.getLayers().length : 0) + ')'] = groups.proposed_new_areas;
+      overlays['Amenity water (' + (groups.amenity_water ? groups.amenity_water.getLayers().length : 0) + ')'] = groups.amenity_water;
+
+      try {
+        var all = L.featureGroup(order.map(function(c){return groups[c];}).filter(Boolean));
+        map.fitBounds(all.getBounds());
+      } catch (e) {}
+
+      var list = document.getElementById('parcel-list');
+      if (list) {
+        list.innerHTML = '';
+        parcels.forEach(function (f) {
+          var li = document.createElement('li');
+          var lab = f.properties._label || f.properties.id;
+          li.textContent = lab + ' \u2014 ' + ((CLASS_META[f.properties.feature_class]||{}).label || f.properties.feature_class || '');
+          li.onclick = function () { try { var b = L.geoJSON(f.geometry).getBounds(); map.fitBounds(b.pad(0.5)); } catch(e){} };
+          list.appendChild(li);
+        });
+      }
+    });
+  }
+
+  function loadCommunity() {
+    return fetch('data/community.geojson').then(function (r) { if (!r.ok) throw new Error('no'); return r.json(); }).then(function (fc) {
+      var feats = (fc && fc.features) ? fc.features : [];
+      var n = 0;
+      feats.forEach(function (f) {
+        f.properties = f.properties || {};
+        f.properties.feature_class = 'community_suggestion';
+        n += 1;
+        f.properties._label = displayLabel(f.properties, null, n);
+      });
+      var meta = CLASS_META.community_suggestion;
+      var layer = L.geoJSON({type:'FeatureCollection', features: feats}, {
+        style: function () { return { color: meta.color, weight: meta.weight, dashArray: meta.dash, fillColor: meta.fill, fillOpacity: meta.fillOpacity, opacity: 0.95 }; },
+        pointToLayer: function (f, latlng) { return L.circleMarker(latlng, { radius: 7, color: meta.color, fillColor: meta.fill, fillOpacity: 0.7, weight: 2 }); },
+        onEachFeature: function (f, l) {
+          var lab = f.properties._label || 'C';
+          l.bindPopup(popupHtml(f.properties, lab));
+          l.bindTooltip(String(lab), { permanent: true, direction: 'center', className: 'feat-label feat-community_suggestion' });
+        }
+      });
+      // off by default (user toggles on); listed last
+      overlays['Community suggestions - indicative (' + feats.length + ')'] = layer;
+    }).catch(function () {
+      overlays['Community suggestions - indicative (0)'] = L.layerGroup();
+    });
+  }
+
+  loadParcels().then(function () { return loadCommunity(); }).catch(function () { return loadCommunity(); }).then(function () {
+    L.control.layers(null, overlays, { collapsed: window.innerWidth < 700 }).addTo(map);
+  }).catch(function () {
     var c = document.getElementById('count'); if (c) c.textContent = 'load error';
   });
 
@@ -224,5 +286,123 @@
         });
       }).catch(function () { addLine('Place lookup failed (network?). Pan and zoom for now.'); });
     }, 450);
+  });
+
+  // --- Community drawing + submission (indicative) ---
+  var drawnLayer = null;
+  function setDrawStatus(msg, cls) {
+    var el = document.getElementById('draw-status'); if (!el) return;
+    el.textContent = msg; el.className = 'sub' + (cls ? ' ' + cls : '');
+  }
+  function setResult(msg, cls) {
+    var el = document.getElementById('c-result'); if (!el) return;
+    el.textContent = msg; el.className = 'sub' + (cls ? ' ' + cls : '');
+  }
+  function asciiVal(s) { return String(s == null ? '' : s).replace(/[^\x20-\x7E\n\r\t]/g, ''); }
+  function stripHouseNumberClient(s) {
+    var t = asciiVal(s);
+    t = t.replace(/^\s*(flat|unit|apt|apartment)?\s*\d+[a-zA-Z]?([\/\-]\d+[a-zA-Z]?)?\s*,?\s*/i, '');
+    t = t.replace(/^\s*\d+\s*-\s*\d+\s*,?\s*/i, '');
+    return t.trim();
+  }
+  function hasSensitiveClient(text) {
+    return /\b(sett|den|nest|roost|badger sett|fox den|bird nest)\b/i.test(String(text || ''));
+  }
+  function clearDrawing() {
+    try { if (drawnLayer) { map.removeLayer(drawnLayer); drawnLayer = null; } } catch (e) {}
+    try { if (map.pm && map.pm.disableDraw) map.pm.disableDraw(); } catch (e) {}
+    setDrawStatus('No drawing yet.');
+  }
+  function captureDraw(layer) {
+    if (drawnLayer) { try { map.removeLayer(drawnLayer); } catch (e) {} }
+    drawnLayer = layer;
+    try { layer.addTo(map); } catch (e) {}
+    setDrawStatus('Drawing captured (indicative). Fill the form and send for review.', 'ok');
+  }
+  if (map.pm) {
+    try {
+      map.pm.setLang('en');
+      // keep global edit/removal off; we only draw a single submission shape
+    } catch (e) {}
+    map.on('pm:create', function (e) {
+      try { if (map.pm.disableDraw) map.pm.disableDraw(); } catch (x) {}
+      if (e && e.layer) captureDraw(e.layer);
+    });
+  }
+
+  var btnArea = document.getElementById('draw-area');
+  var btnMarker = document.getElementById('draw-marker');
+  var btnClear = document.getElementById('draw-clear');
+  if (btnArea) btnArea.onclick = function () {
+    setResult('');
+    if (!map.pm) { setDrawStatus('Drawing tool not available. Please use the contact form.', 'err'); return; }
+    clearDrawing();
+    try {
+      map.pm.enableDraw('Polygon', { snappable: false, templineStyle: { color: '#6A1B9A' }, hintlineStyle: { color: '#6A1B9A', dashArray: '5,5' }, pathOptions: { color: '#6A1B9A', fillColor: '#BA68C8', fillOpacity: 0.25 } });
+      setDrawStatus('Tap/click the map to draw an indicative area. Double-click/tap last point to finish.');
+    } catch (e) { setDrawStatus('Could not start drawing. Please use the contact form.', 'err'); }
+  };
+  if (btnMarker) btnMarker.onclick = function () {
+    setResult('');
+    if (!map.pm) { setDrawStatus('Drawing tool not available. Please use the contact form.', 'err'); return; }
+    clearDrawing();
+    try {
+      map.pm.enableDraw('Marker');
+      setDrawStatus('Tap/click the map to place an indicative marker.');
+    } catch (e) { setDrawStatus('Could not start marker. Please use the contact form.', 'err'); }
+  };
+  if (btnClear) btnClear.onclick = function () { clearDrawing(); setResult(''); };
+
+  var form = document.getElementById('community-form');
+  if (form) form.addEventListener('submit', function (ev) {
+    ev.preventDefault();
+    setResult('');
+    if (!drawnLayer) { setResult('Please draw an indicative area or add a marker first.', 'err'); return; }
+    var streetRaw = asciiVal(document.getElementById('c-street').value);
+    var street = stripHouseNumberClient(streetRaw);
+    var place = asciiVal(document.getElementById('c-place').value).trim();
+    if (!street && !place) { setResult('Please add a street/area or a place name (no house numbers).', 'err'); return; }
+    var attrs = {
+      place: place,
+      street: street,
+      broad_type: asciiVal(document.getElementById('c-type').value),
+      wildlife_tick: !!document.getElementById('c-wildlife').checked,
+      use: asciiVal(document.getElementById('c-use').value).trim(),
+      meaning: asciiVal(document.getElementById('c-meaning').value).trim(),
+      joins_barrier: asciiVal(document.getElementById('c-joins').value).trim(),
+      interested_in_helping: asciiVal(document.getElementById('c-help').value),
+      quote_ok: asciiVal(document.getElementById('c-quote').value)
+    };
+    if (hasSensitiveClient([place, street, attrs.use, attrs.meaning, attrs.joins_barrier].join(' '))) {
+      setResult('Please do not include precise wildlife locations (sett, den, nest, roost). Keep it street-level and general.', 'err');
+      return;
+    }
+    var geom = null;
+    try { geom = drawnLayer.toGeoJSON().geometry; } catch (e) { geom = null; }
+    if (!geom) { setResult('Could not read the drawing. Please try again.', 'err'); return; }
+
+    var endpoint = String(window.COMMUNITY_SUBMIT_URL || '').trim();
+    if (!endpoint) {
+      setResult('Submissions are not configured yet. Please use the contact/survey form for now: https://gnkng.github.io/green-corridor/survey-swindon.html', 'err');
+      return;
+    }
+    var payload = { geometry: geom, attributes: attrs, website: asciiVal(document.getElementById('c-website').value) };
+    var btn = document.getElementById('c-submit');
+    if (btn) { btn.disabled = true; btn.textContent = 'Sending...'; }
+    setResult('Sending for review...');
+    fetch(endpoint, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) })
+      .then(function (r) { return r.json().catch(function(){ return {}; }).then(function(d){ return { ok: r.ok, data: d }; }); })
+      .then(function (res) {
+        var msg = (res.data && (res.data.message || res.data.error)) || '';
+        if (res.ok && res.data && res.data.ok) {
+          setResult(msg || 'Thank you. Your suggestion was queued for review before it appears on the map.', 'ok');
+          form.reset();
+          clearDrawing();
+        } else {
+          setResult(msg || 'Could not send right now. Please try the contact/survey form.', 'err');
+        }
+      })
+      .catch(function () { setResult('Network error. Please try the contact/survey form.', 'err'); })
+      .then(function () { if (btn) { btn.disabled = false; btn.textContent = 'Send for review'; } });
   });
 })();
