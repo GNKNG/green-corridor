@@ -6,7 +6,7 @@
 <title>Swindon green corridors - residents map (DRAFT)</title>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <link rel="stylesheet" href="https://unpkg.com/@geoman-io/leaflet-geoman-free@2.16.0/dist/leaflet-geoman.css">
-<link rel="stylesheet" href="style.css?v=19">
+<link rel="stylesheet" href="style.css?v=20">
 </head>
 <body>
 <header id="banner">
@@ -29,14 +29,16 @@
     <div class="draw-controls">
       <button type="button" id="draw-area" class="btn">Draw area (polygon)</button>
       <button type="button" id="draw-marker" class="btn">Add marker (point/flag)</button>
+      <button type="button" id="draw-finish" class="btn btn-muted">Finish area</button>
       <button type="button" id="draw-clear" class="btn btn-muted">Clear drawing</button>
       <button type="button" id="draw-help-btn" class="btn btn-muted">Help</button>
+      <button type="button" id="pending-clear" class="btn btn-muted">Clear my pending</button>
     </div>
     <div id="draw-help" class="sub draw-help" hidden>
       <strong>How to draw (basic):</strong><br>
-      - <strong>Draw area (polygon):</strong> tap/click the map to add points around the area. To finish, double-click or tap the last point (or the first point) to close the shape.<br>
+      - <strong>Draw area (polygon):</strong> tap/click the map to add points around the area. To finish, double-click/tap the last point (or the first point), or use <strong>Finish area</strong>.<br>
       - <strong>Add marker (point/flag):</strong> tap/click the map once to place a marker.<br>
-      - You can <strong>Clear drawing</strong> and try again. Drawings are indicative only.
+      - <strong>Clear drawing</strong> removes the current draft. <strong>Clear my pending</strong> removes your locally saved pending (P) markers on this device only. Drawings are indicative only.
     </div>
     <p id="draw-status" class="sub" aria-live="polite">No drawing yet.</p>
     <form id="community-form" novalidate>
@@ -57,8 +59,9 @@
       </select>
       <label for="c-notes">Comments (optional, free text)</label>
       <textarea id="c-notes" name="notes" maxlength="800" rows="3"></textarea>
-      <label for="c-contact">Contact (optional, anything or nothing)</label>
+      <label for="c-contact">Contact (optional)</label>
       <input id="c-contact" name="contact" type="text" maxlength="200" autocomplete="off">
+      <p class="sub">Privacy: do not put personal contact details (email/phone) here. To get in touch, use the <a href="https://gnkng.github.io/green-corridor/survey-swindon.html">contact/survey form</a>.</p>
       <input id="c-website" name="website" type="text" tabindex="-1" autocomplete="off" class="hp" aria-hidden="true">
       <button type="submit" id="c-submit" class="btn btn-primary">Send for review</button>
     </form>
@@ -67,7 +70,7 @@
     <h2>Parcels/features (<span id="count">0</span>)</h2>
     <ul id="parcel-list"></ul>
     <h2>About</h2>
-    <p>Layers (toggle on map): adopted EN1 green corridors (policy context), proposed new areas (DRAFT / indicative, emerging context), amenity water (indicative), and approved community suggestions (indicative, reviewed). The emerging Local Plan/proposed map is not adopted. Not seeing a place here does not by itself settle its status.</p>
+    <p>Layers (toggle on map): adopted EN1 green corridors (policy context), proposed new areas (DRAFT / indicative, emerging context), amenity water (indicative, includes OSM/Overpass-derived features where shown; (c) OpenStreetMap contributors, ODbL), and approved community suggestions (indicative, reviewed). The emerging Local Plan/proposed map is not adopted. Not seeing a place here does not by itself settle its status.</p>
     <p>Contact: <a href="https://gnkng.github.io/green-corridor/survey-swindon.html">survey/contact form</a>. Full map: <a href="https://gnkng.github.io/green-corridor/az-viewer/">az-viewer</a>. Facebook: <a href="https://www.facebook.com/swindon.green.spaces">Swindon green spaces</a>.</p>
     <p><a href="https://consultations.swindon.gov.uk/publication-stage-swindon-local-plan-2043">Council Reg 19 hub (formal route only)</a></p>
   </aside>
@@ -76,6 +79,6 @@
 <script>window.COMMUNITY_SUBMIT_URL = 'https://twilight-violet-8787.danmillerarchaeology.workers.dev';</script>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://unpkg.com/@geoman-io/leaflet-geoman-free@2.16.0/dist/leaflet-geoman.min.js"></script>
-<script src="app.js?v=19"></script>
+<script src="app.js?v=20"></script>
 </body>
 </html>

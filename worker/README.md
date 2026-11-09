@@ -25,5 +25,12 @@ Receives community map submissions from `az-viewer` and opens a GitHub pull requ
 - **Approve:** move/merge the feature into `az-viewer/data/community.geojson` (append to `features`, keep `feature_class: community_suggestion`, set a stable id/label if desired) and merge/close; push to `main` -> viewer shows it.
 - **Reject/spam:** close PR, delete branch. For repeat abuse, add rate-limiting / Turnstile at the Worker.
 
+## Privacy / schema
+- No respondent email is collected. `contact` is accepted by the form but **raw contact is not stored** in PR records (worker stores `contact_provided` flag only) to avoid publishing PII in a public repo. Submissions include `notes` (comments) and `geometry_kind` (marker/area).
+- Redeploy the worker (e.g. `worker-safe.js`) after pulling updates so server-side behavior matches.
+
 ## Rate limiting / spam (v1 minimal)
 The worker includes a honeypot and validation. For production hardening add Cloudflare Rate Limiting / Turnstile and an IP denylist in KV. Git history remains the safety net (revert bad merges).
+
+## Moderation helper
+See `az-viewer/MODERATE.md` for the checklist. Optional: `python worker/promote_pending.py <pending.json> az-viewer/data/community.geojson` (drops `ip_hash`, sets approved, appends; review then commit).

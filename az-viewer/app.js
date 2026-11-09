@@ -203,7 +203,7 @@
   }
 
   function loadParcels() {
-    return fetch('data/parcels-public.geojson?v=18').then(function (r) { return r.json(); }).then(function (fc) {
+    return fetch('data/parcels-public.geojson?v=20').then(function (r) { return r.json(); }).then(function (fc) {
       parcels = fc.features || [];
       var proposedSeq = buildProposedSeq(parcels);
       parcels.forEach(function (f) { f.properties = f.properties || {}; f.properties._label = displayLabel(f.properties, proposedSeq, null); });
@@ -395,7 +395,19 @@
   var btnClear = document.getElementById('draw-clear');
   var btnHelp = document.getElementById('draw-help-btn');
   var helpBox = document.getElementById('draw-help');
+  var btnFinish = document.getElementById('draw-finish');
+  var btnPendingClear = document.getElementById('pending-clear');
   if (btnHelp && helpBox) btnHelp.onclick = function () { helpBox.hidden = !helpBox.hidden; };
+  if (btnFinish) btnFinish.onclick = function () {
+    try {
+      if (map.pm && map.pm.Draw && map.pm.Draw.Polygon && map.pm.Draw.Polygon.enabled()) { map.pm.Draw.Polygon._finishShape(); return; }
+      if (map.pm && map.pm.globalDrawModeEnabled && map.pm.globalDrawModeEnabled()) { /* try generic finish */ }
+    } catch (e) {}
+    setDrawStatus('If drawing an area, double-click/tap the last point to finish (or add more points first).', 'err');
+  };
+  if (btnPendingClear) btnPendingClear.onclick = function () {
+    try { saveLocalPending([]); renderMyPending(); setResult('Cleared your pending (P) markers on this device.', 'ok'); } catch (e) { setResult('Could not clear pending markers.', 'err'); }
+  };
   if (btnArea) btnArea.onclick = function () {
     setResult('');
     if (!map.pm) { setDrawStatus('Drawing tool not available. Please use the contact form.', 'err'); return; }

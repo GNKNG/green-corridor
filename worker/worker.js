@@ -128,7 +128,7 @@ async function handleSubmission(body, ip, env) {
       street_area: street,
       broad_type: clampText(attrs.broad_type, 60),
       notes: notes,
-      contact: contact,
+      contact_provided: !!contact,
       ip_hash: await hashIp(ip)
     }
   };
