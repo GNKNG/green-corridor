@@ -1,0 +1,41 @@
+{
+  "type": "Feature",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          -1.942177,
+          51.585177
+        ],
+        [
+          -1.952477,
+          51.574509
+        ],
+        [
+          -1.928444,
+          51.575576
+        ],
+        [
+          -1.942177,
+          51.585177
+        ]
+      ]
+    ]
+  },
+  "properties": {
+    "feature_class": "community_suggestion",
+    "status": "pending_review",
+    "submitted_at": "2026-11-09T15:39:37Z",
+    "place": "constable",
+    "street_area": "",
+    "broad_type": "",
+    "wildlife_tick": false,
+    "use_note": "",
+    "meaning_note": "",
+    "joins_barrier": "",
+    "interested_in_helping": "",
+    "quote_ok": "",
+    "ip_hash": "be7ba12180df3307"
+  }
+}
