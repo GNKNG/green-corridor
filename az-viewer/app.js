@@ -206,7 +206,7 @@
           onEachFeature: function (f, l) {
             var lab = f.properties._label || f.properties.id;
             l.bindPopup(popupHtml(f.properties, lab));
-            l.bindTooltip(String(lab), { permanent: true, direction: 'center', className: 'feat-label feat-' + cls });
+            if (cls !== 'amenity_water') l.bindTooltip(String(lab), { permanent: true, direction: 'center', className: 'feat-label feat-' + cls });
           }
         }).addTo(map);
       });
