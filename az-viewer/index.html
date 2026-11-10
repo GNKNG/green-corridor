@@ -6,7 +6,7 @@
 <title>Swindon green corridors - residents map (DRAFT)</title>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <link rel="stylesheet" href="https://unpkg.com/@geoman-io/leaflet-geoman-free@2.16.0/dist/leaflet-geoman.css">
-<link rel="stylesheet" href="style.css?v=26">
+<link rel="stylesheet" href="style.css?v=27">
 </head>
 <body>
 
@@ -141,6 +141,23 @@
             <option value="other">Other</option>
           </select>
 
+          <label for="c-species">Wildlife / species focus (optional)</label>
+          <select id="c-species" name="species">
+            <option value="">Select (optional / habitat only)</option>
+            <option value="none">No specific species (habitat / landscape only)</option>
+            <option value="badger">Badger (presence generalised per 1992 Act)</option>
+            <option value="birds">Birds / nesting habitat</option>
+            <option value="bats">Bats / foraging route</option>
+            <option value="amphibians">Amphibians / reptiles (e.g. Great Crested Newt)</option>
+            <option value="mammals_other">Other mammals (hedgehog, deer, etc.)</option>
+            <option value="invertebrates">Insects / pollinators / butterflies</option>
+            <option value="flora">Flora / wildflowers / veteran trees</option>
+            <option value="unclassified">Unclassified / other (held for review)</option>
+          </select>
+          <div id="species-badger-notice" class="species-notice" style="display:none; font-size:11.5px; color:#92400e; background:#fef3c7; border:1px solid #fde68a; padding:7px 10px; border-radius:6px; margin:4px 0 10px 0; line-height:1.35;">
+            <strong>Protection Notice:</strong> Badger presence records are automatically generalised to a 500m grid square per the <em>Protection of Badgers Act 1992</em>. Exact sett locations or pinpoint coordinates are never captured, stored, or published.
+          </div>
+
           <label for="c-notes">Comments (optional, free text)</label>
           <textarea id="c-notes" name="notes" maxlength="800" rows="3" placeholder="Notes about this green space..."></textarea>
 
@@ -164,6 +181,6 @@
 <script>window.COMMUNITY_SUBMIT_URL = 'https://twilight-violet-8787.danmillerarchaeology.workers.dev';</script>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://unpkg.com/@geoman-io/leaflet-geoman-free@2.16.0/dist/leaflet-geoman.min.js"></script>
-<script src="app.js?v=26"></script>
+<script src="app.js?v=27"></script>
 </body>
 </html>

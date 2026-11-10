@@ -1,0 +1,34 @@
+{
+  "schema_version": "1.0",
+  "export_date": "2026-11-09",
+  "config": "publish_config.yaml",
+  "source": {
+    "kind": "sqlite",
+    "path": "../map-data/baseline-v1-reg19.geojson.sqlite"
+  },
+  "counts": {
+    "source_features": 1104,
+    "exported": 900,
+    "denied": 204,
+    "dropped_no_geometry": 0,
+    "by_feature_class": {
+      "proposed_new_areas": 165,
+      "en1_green_corridor": 40,
+      "amenity_water": 695
+    }
+  },
+  "output": "parcels-public.geojson",
+  "output_bytes": 852399,
+  "sha256": "62e9bf7c78e9d08cc32e46335cf740ae53136a0a73b90782416c88f8f6aedb34",
+  "banners": {
+    "draft": "DRAFT / NOTHING FILED",
+    "indicative": "Indicative only - not a legal boundary.",
+    "adopted_vs_emerging": "Adopted EN1 shown as policy context; emerging Reg 19 context is indicative only.",
+    "attribution_osm": "(c) OpenStreetMap contributors (ODbL) - where OSM-derived features are shown"
+  },
+  "notes": [
+    "Deterministic given same source+config+date.",
+    "DRAFT / NOTHING FILED. Indicative only, not a legal boundary.",
+    "Constable Road SN2 7JF excluded as separate survey-style example only."
+  ]
+}
