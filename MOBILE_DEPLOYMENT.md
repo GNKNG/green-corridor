@@ -86,3 +86,21 @@ npm run cap:open:android
 Under all deployment options (Web, PWA, APK):
 - Any survey return mentioning badgers or setts is **automatically snapped to Swindon Borough Council Civic Offices (Euclid Street, SN1 2JH)** before leaving the device.
 - Pinpoint badger coordinates are never stored locally, transmitted across the network, or published to public layers.
+
+---
+
+## 5. Additional Field Surveyor Features (v=32)
+
+### Client-Side EXIF Photo Scrubbing
+- Volunteers can attach photos of veteran trees, habitats, ponds, or boundary features.
+- An in-browser canvas re-encoder automatically discards all EXIF metadata (GPS coordinates, timestamps, device make/model) and optimizes photo size to 1280px before storage or upload.
+
+### One-Click "Share This Space" & Deep Links
+- Every feature popup has a **Share this space** button.
+- On mobile devices, triggers the native OS share sheet (`navigator.share`) for instant WhatsApp, Email, or Messaging dispatch.
+- Supports URL hash routing (e.g. `#parcel=23` or `#parcel=p12` or `#loc=51.56,-1.78,16`) which automatically zooms to the exact parcel and opens its details.
+
+### Baseline Reference Layers
+- **Natural England Ancient Woodland Inventory**: 51 irreplaceable ancient semi-natural woodland sites in Swindon (NPPF protected).
+- **Swindon Borough Public Rights of Way (PRoW)**: 684 official legal footpaths, bridleways, and byways across Swindon Borough.
+

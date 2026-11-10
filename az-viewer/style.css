@@ -265,6 +265,8 @@ body {
 .layer-swatch-park { border-color: #2E7D32; border-style: dashed; background: rgba(129,199,132,0.35); }
 .layer-swatch-community { border-color: #6A1B9A; border-style: dashed; background: rgba(186,104,200,0.3); }
 .layer-swatch-pending { border-color: #455A64; border-style: dashed; background: rgba(144,164,174,0.3); }
+.layer-swatch-ancientwoodland { border-color: #166534; border-style: dashed; background: rgba(34,197,94,0.38); }
+.layer-swatch-prow { border-color: #d97706; border-style: dashed; background: rgba(217,119,6,0.35); }
 .layer-swatch-pack { border-color: #0f766e; border-style: solid; background: rgba(45,212,191,0.5); }
 
 /* Offline Map Packs in Layers dropdown */
@@ -783,6 +785,8 @@ body {
 .feat-label.feat-registered_park_garden { border-color: #2E7D32; color: #1B5E20; font-size: 11px; }
 .feat-label.feat-community_suggestion { border-color: #6A1B9A; color: #4A148C; }
 .feat-label.feat-my_pending { border-color: #455A64; color: #263238; }
+.feat-label.feat-ancient_woodland { border-color: #166534; color: #14532d; font-size: 11px; }
+.feat-label.feat-public_right_of_way { border-color: #d97706; color: #92400e; font-size: 10.5px; }
 
 /* Popups */
 .leaflet-popup-content {
@@ -791,6 +795,72 @@ body {
 }
 .leaflet-popup-content strong {
   color: #1f4a2c;
+}
+
+/* Feature Popup Share Button */
+.popup-share-container {
+  margin-top: 8px;
+  padding-top: 6px;
+  border-top: 1px solid #e2ebd8;
+}
+.popup-share-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  font-size: 11.5px;
+  padding: 5px 8px;
+  background: #f8fafc;
+  border: 1px solid #cbd5e1;
+  border-radius: 4px;
+  color: #1e293b;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background 0.15s;
+}
+.popup-share-btn:hover {
+  background: #f1f5f9;
+  border-color: #94a3b8;
+}
+
+/* Photo Attachment in Form */
+.photo-preview-wrap {
+  margin: 6px 0 10px 0;
+  position: relative;
+}
+.photo-preview-img {
+  max-width: 100%;
+  max-height: 160px;
+  border-radius: 6px;
+  border: 1px solid #c4d4be;
+  object-fit: cover;
+  display: block;
+}
+.photo-scrub-badge {
+  font-size: 11px;
+  color: #15803d;
+  margin-top: 3px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.photo-remove-btn {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  padding: 2px 7px;
+  font-size: 11px;
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid #cbd5e1;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.photo-remove-btn:hover {
+  background: #fee2e2;
+  border-color: #fca5a5;
+  color: #b91c1c;
 }
 
 /* Mobile & Phone Responsive Rules */

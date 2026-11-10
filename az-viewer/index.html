@@ -13,7 +13,7 @@
 <link rel="apple-touch-icon" href="icons/icon-180.png">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <link rel="stylesheet" href="https://unpkg.com/@geoman-io/leaflet-geoman-free@2.16.0/dist/leaflet-geoman.css">
-<link rel="stylesheet" href="style.css?v=31">
+<link rel="stylesheet" href="style.css?v=32">
 </head>
 <body>
 
@@ -79,6 +79,8 @@
           <li><strong>Area (&#9645;):</strong> Tap the map to outline a green corridor or habitat area. Double-tap or click Finish to complete.</li>
           <li><strong>Marker (&#9873;):</strong> Tap the map to flag a specific habitat feature, veteran tree, pond, or verge.</li>
           <li><strong>Measure / Calc Area:</strong> Check boundary lengths and estimated area in hectares.</li>
+          <li><strong>Photos:</strong> You can attach a photo of a habitat, veteran tree, or green space. All camera EXIF GPS location tags are automatically stripped on your phone before upload to protect wildlife and privacy.</li>
+          <li><strong>Share a Space:</strong> Tap any green space or right of way on the map and click <strong>Share this space</strong> to copy a direct link or share straight to WhatsApp or email.</li>
         </ul>
       </div>
 
@@ -259,6 +261,16 @@
           <label for="c-contact">Contact (optional)</label>
           <input id="c-contact" name="contact" type="text" maxlength="200" autocomplete="off" placeholder="Name or organisation">
 
+          <label for="c-photo">Attach photo (optional &mdash; wildlife, habitat, or feature)</label>
+          <input id="c-photo" name="photo" type="file" accept="image/*" capture="environment">
+          <div id="photo-preview-wrap" class="photo-preview-wrap" style="display:none;">
+            <div style="position:relative; display:inline-block;">
+              <img id="photo-preview-img" class="photo-preview-img" src="" alt="Attached photo preview">
+              <button type="button" id="photo-remove-btn" class="photo-remove-btn" title="Remove attached photo">&times; Remove</button>
+            </div>
+            <div id="photo-scrub-badge" class="photo-scrub-badge">&#10003; Photo ready &mdash; EXIF location metadata scrubbed</div>
+          </div>
+
           <p class="sub" style="font-size: 11px; color: #64748b; margin: 8px 0 12px 0; line-height: 1.35;">
             <strong>Privacy &amp; Wildlife Notice:</strong> Records of protected species should be submitted to the Council. Any badger records submitted here are snapped to Swindon Borough Council Civic Offices &mdash; it is an offence to make public the location of a badger sett. Please do not include house numbers or precise sett/nest locations.
           </p>
@@ -278,6 +290,6 @@
 <script>window.COMMUNITY_SUBMIT_URL = 'https://twilight-violet-8787.danmillerarchaeology.workers.dev';</script>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://unpkg.com/@geoman-io/leaflet-geoman-free@2.16.0/dist/leaflet-geoman.min.js"></script>
-<script src="app.js?v=31"></script>
+<script src="app.js?v=32"></script>
 </body>
 </html>

@@ -83,6 +83,8 @@ def build_pack(source_dir: Path, output_file: Path, compress: bool = False) -> i
 
     layers_to_find = [
         "parcels-public.geojson",
+        "ancient-woodland.geojson",
+        "prow-swindon.geojson",
         "community.geojson"
     ]
 

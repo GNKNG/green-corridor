@@ -228,6 +228,8 @@
     conservation_area:  { label: 'Conservation Area (statutory heritage)', color: '#8D6E63', fill: '#D7CCC8', weight: 2, dash: '5 4', fillOpacity: 0.22, hatch: null, defaultVisible: false, swatch: 'layer-swatch-conservation' },
     listed_building:    { label: 'Listed Building (Grade I & II*)', color: '#B45309', fill: '#F59E0B', weight: 2, dash: null, fillOpacity: 0.9, hatch: null, defaultVisible: false, swatch: 'layer-swatch-listed' },
     registered_park_garden: { label: 'Registered Park & Garden (heritage designation)', color: '#2E7D32', fill: '#81C784', weight: 2, dash: '4 4', fillOpacity: 0.22, hatch: null, defaultVisible: false, swatch: 'layer-swatch-park' },
+    ancient_woodland: { label: 'Ancient Woodland (Natural England Inventory)', color: '#166534', fill: '#22c55e', weight: 2.5, dash: '5 3', fillOpacity: 0.28, hatch: null, defaultVisible: false, swatch: 'layer-swatch-ancientwoodland' },
+    public_right_of_way: { label: 'Public Rights of Way (Footpaths & Bridleways)', color: '#d97706', fill: null, weight: 2.4, dash: '4 4', fillOpacity: 0, hatch: null, defaultVisible: false, swatch: 'layer-swatch-prow' },
     community_suggestion: { label: 'Community suggestion (indicative, reviewed)', color: '#6A1B9A', fill: '#BA68C8', weight: 2, dash: '4 4', fillOpacity: 0.18, hatch: null, defaultVisible: false, swatch: 'layer-swatch-community' },
     my_pending: { label: 'My pending suggestion (local, awaiting review)', color: '#455A64', fill: '#90A4AE', weight: 2, dash: '6 4', fillOpacity: 0.2, hatch: null, defaultVisible: true, swatch: 'layer-swatch-pending' }
   };
@@ -350,57 +352,76 @@
       '<em>Queued for review - only visible on this device until approved. Indicative only. All badger records are snapped to Swindon Borough Council Civic Offices per Protection of Badgers Act 1992.</em>';
   }
 
+  function shareButtonHtml(shareId, shareTitle) {
+    if (!shareId) return '';
+    return '<div class="popup-share-container">' +
+      '<button type="button" class="popup-share-btn" data-share-id="' + esc(shareId) + '" data-share-title="' + esc(shareTitle || 'Green Space') + '">' +
+      '<span style="font-size:12px;">&#128279;</span> Share this space' +
+      '</button>' +
+      '</div>';
+  }
+
   function popupHtml(p, lab) {
     if (p.feature_class === 'my_pending') return myPendingPopupHtml(p, lab);
     if (p.feature_class === 'community_suggestion') return communityPopupHtml(p, lab);
     var meta = CLASS_META[p.feature_class] || { label: p.feature_class || '' };
+    var content = '';
 
-    if (p.feature_class === 'scheduled_monument' || p.feature_class === 'registered_park_garden') {
-      return '<strong>' + esc(lab) + '</strong>' +
+    if (p.feature_class === 'ancient_woodland') {
+      content = '<strong>' + esc(lab) + '</strong><br>' +
+        'Designation: ' + esc(p.designation || 'Natural England Ancient Woodland') + '<br>' +
+        'Status: ' + esc(p.status || 'Statutory Ancient Woodland') + '<br>' +
+        (p.area_ha ? 'Area: ' + esc(p.area_ha) + ' ha<br>' : '') +
+        'Source: ' + esc(p.source || 'Natural England Inventory (Defra)') + '<br>' +
+        '<em>Irreplaceable ancient habitat protected under NPPF paragraph 186.</em>';
+    } else if (p.feature_class === 'public_right_of_way') {
+      content = '<strong>' + esc(p.name || lab) + '</strong><br>' +
+        'Type: <strong>' + esc(p.prow_type || 'Public Right of Way') + '</strong><br>' +
+        'Source: ' + esc(p.source || 'Swindon Borough Council Definitive Map') + '<br>' +
+        '<em>Legal public highway network (Definitive Map interpretation, OGL).</em>';
+    } else if (p.feature_class === 'scheduled_monument' || p.feature_class === 'registered_park_garden') {
+      content = '<strong>' + esc(lab) + '</strong>' +
         (p.ref ? ' <span style="color:#666">(NHLE ' + esc(p.ref) + ')</span>' : '') + '<br>' +
         'Type: ' + esc(meta.label) + '<br>' +
         'Status: ' + esc(p.status || 'Statutory designation') + '<br>' +
         (p.hyperlink ? 'Register: <a href="' + esc(p.hyperlink) + '" target="_blank" rel="noopener">Historic England National Heritage List</a><br>' : '') +
         '<em>Statutory designation, Historic England NHLE (OGL v3.0).</em>';
-    }
-    if (p.feature_class === 'listed_building') {
-      return '<strong>' + esc(lab) + '</strong>' +
+    } else if (p.feature_class === 'listed_building') {
+      content = '<strong>' + esc(lab) + '</strong>' +
         (p.ref ? ' <span style="color:#666">(NHLE ' + esc(p.ref) + ')</span>' : '') + '<br>' +
         'Grade: <strong>' + esc(p.grade || 'I / II*') + '</strong><br>' +
         'Status: ' + esc(p.status || 'Statutory designation') + '<br>' +
         (p.hyperlink ? '<a href="' + esc(p.hyperlink) + '" target="_blank" rel="noopener">Historic England List Entry</a><br>' : '') +
         '<em>Statutory Listed Building, Historic England NHLE (OGL v3.0).</em>';
-    }
-    if (p.feature_class === 'conservation_area') {
-      return '<strong>' + esc(lab) + '</strong>' +
+    } else if (p.feature_class === 'conservation_area') {
+      content = '<strong>' + esc(lab) + '</strong>' +
         (p.ref ? ' <span style="color:#666">(UID ' + esc(p.ref) + ')</span>' : '') + '<br>' +
         'Type: ' + esc(meta.label) + '<br>' +
         (p.date_designated ? 'Designated: ' + esc(p.date_designated) + '<br>' : '') +
         'Status: ' + esc(p.status || 'Statutory designation') + '<br>' +
         '<em>Designated under Planning (Listed Buildings and Conservation Areas) Act 1990.</em>';
-    }
-    if (p.feature_class === 'unscheduled_archaeology') {
-      return '<strong>' + esc(lab) + '</strong>' +
+    } else if (p.feature_class === 'unscheduled_archaeology') {
+      content = '<strong>' + esc(lab) + '</strong>' +
         ' <span style="color:#666">(' + esc(p.id) + ')</span><br>' +
         'Type: ' + esc(meta.label) + '<br>' +
         'Policy: ' + esc(p.official_designation || 'Swindon Local Plan') + '<br>' +
         'Source: ' + esc(p.source || 'SBC Planning Portal WFS') + '<br>' +
         '<em>Local Plan archaeological notification area (indicative context).</em>';
-    }
-    if (p.feature_class === 'country_park_core' || p.feature_class === 'recreation_ground') {
-      return '<strong>' + esc(lab) + '</strong>' +
+    } else if (p.feature_class === 'country_park_core' || p.feature_class === 'recreation_ground') {
+      content = '<strong>' + esc(lab) + '</strong>' +
         ' <span style="color:#666">(' + esc(p.id) + ')</span><br>' +
         'Type: ' + esc(meta.label) + '<br>' +
         'Status: ' + esc(p.status || 'Adopted / Protected Open Space') + '<br>' +
         '<em>Public open space / recreation asset (adopted planning baseline).</em>';
+    } else {
+      content = '<strong>' + esc(lab) + '</strong>' +
+        ' <span style="color:#666">(' + esc(p.id) + ')</span><br>' +
+        'Type: ' + esc(meta.label) + '<br>' +
+        'Status: ' + esc(p.status) + '<br>' +
+        'Date: ' + esc(p.date || '') + '<br>' +
+        '<em>DRAFT / NOTHING FILED. Indicative only, not a legal boundary.</em>';
     }
-
-    return '<strong>' + esc(lab) + '</strong>' +
-      ' <span style="color:#666">(' + esc(p.id) + ')</span><br>' +
-      'Type: ' + esc(meta.label) + '<br>' +
-      'Status: ' + esc(p.status) + '<br>' +
-      'Date: ' + esc(p.date || '') + '<br>' +
-      '<em>DRAFT / NOTHING FILED. Indicative only, not a legal boundary.</em>';
+    return content + shareButtonHtml(p._label || p.id || lab, lab);
   }
 
   var importedLayers = [];
@@ -419,6 +440,8 @@
       { layer: groups.conservation_area, cls: 'layer-swatch-conservation', name: 'Conservation Areas (' + (groups.conservation_area ? groups.conservation_area.getLayers().length : 0) + ')' },
       { layer: groups.listed_building, cls: 'layer-swatch-listed', name: 'Listed Buildings Grade I & II* (' + (groups.listed_building ? groups.listed_building.getLayers().length : 0) + ')' },
       { layer: groups.registered_park_garden, cls: 'layer-swatch-park', name: 'Registered Parks & Gardens (' + (groups.registered_park_garden ? groups.registered_park_garden.getLayers().length : 0) + ')' },
+      { layer: groups.ancient_woodland, cls: 'layer-swatch-ancientwoodland', name: 'Ancient Woodland (' + (groups.ancient_woodland ? groups.ancient_woodland.getLayers().length : 0) + ')' },
+      { layer: groups.public_right_of_way, cls: 'layer-swatch-prow', name: 'Public Rights of Way (' + (groups.public_right_of_way ? groups.public_right_of_way.getLayers().length : 0) + ')' },
       { layer: overlays['Community suggestions - indicative (approved)'], cls: 'layer-swatch-community', name: 'Community suggestions' },
       { layer: myPendingLayer, cls: 'layer-swatch-pending', name: 'My pending suggestions' }
     ];
@@ -698,14 +721,166 @@
     });
   }
 
-  loadParcels().then(function () { return loadCommunity(); }).catch(function () { return loadCommunity(); }).then(function () {
-    renderMyPending();
-    overlays['My pending (local, awaiting review)'] = myPendingLayer;
-    myPendingLayer.addTo(map);
-    buildLayersMenu();
-  }).catch(function () {
-    var c = document.getElementById('count'); if (c) c.textContent = 'load error';
+  function loadAncientWoodland() {
+    return fetch('data/ancient-woodland.geojson').then(function (r) { if (!r.ok) throw new Error('no'); return r.json(); }).then(function (fc) {
+      var feats = (fc && fc.features) ? fc.features : [];
+      var meta = CLASS_META.ancient_woodland;
+      var layer = L.geoJSON({type: 'FeatureCollection', features: feats}, {
+        style: function () {
+          return { color: meta.color, weight: meta.weight, dashArray: meta.dash, fillColor: meta.fill, fillOpacity: meta.fillOpacity, opacity: 0.95 };
+        },
+        onEachFeature: function (f, l) {
+          var p = f.properties || {};
+          var lab = p.name || 'Ancient Woodland';
+          l.bindPopup(popupHtml(p, lab));
+          l.on('click', function (ev) { try { L.DomEvent.stopPropagation(ev); } catch(e){} showSelectedLabel(l, lab, 'ancient_woodland'); });
+        }
+      });
+      groups.ancient_woodland = layer;
+      overlays['Ancient Woodland (' + feats.length + ')'] = layer;
+    }).catch(function () {
+      groups.ancient_woodland = L.layerGroup();
+    });
+  }
+
+  function loadProw() {
+    return fetch('data/prow-swindon.geojson').then(function (r) { if (!r.ok) throw new Error('no'); return r.json(); }).then(function (fc) {
+      var feats = (fc && fc.features) ? fc.features : [];
+      var layer = L.geoJSON({type: 'FeatureCollection', features: feats}, {
+        style: function (f) {
+          var p = (f && f.properties) || {};
+          var col = '#d97706';
+          var dash = '4 4';
+          if (p.code === 'Br') { col = '#0284c7'; dash = '6 4'; }
+          else if (p.code === 'By' || p.code === 'Ru') { col = '#dc2626'; dash = null; }
+          return { color: col, weight: 2.4, dashArray: dash, opacity: 0.9 };
+        },
+        onEachFeature: function (f, l) {
+          var p = f.properties || {};
+          var lab = p.name || 'Right of Way';
+          l.bindPopup(popupHtml(p, lab));
+          l.on('click', function (ev) { try { L.DomEvent.stopPropagation(ev); } catch(e){} showSelectedLabel(l, lab, 'public_right_of_way'); });
+        }
+      });
+      groups.public_right_of_way = layer;
+      overlays['Public Rights of Way (' + feats.length + ')'] = layer;
+    }).catch(function () {
+      groups.public_right_of_way = L.layerGroup();
+    });
+  }
+
+  function copyTextToClipboard(text) {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).catch(function () {});
+    } else {
+      var ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.position = 'fixed';
+      ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.select();
+      try { document.execCommand('copy'); } catch (e) {}
+      document.body.removeChild(ta);
+    }
+  }
+
+  function navigateToParcel(targetId) {
+    if (!targetId) return;
+    var lower = targetId.toLowerCase().trim();
+    var found = null;
+    for (var i = 0; i < parcels.length; i++) {
+      var p = parcels[i].properties || {};
+      var lab = (p._label || '').toLowerCase();
+      var pid = String(p.id || '').toLowerCase();
+      if (pid === lower || lab === lower) {
+        found = parcels[i];
+        break;
+      }
+    }
+    if (found) {
+      try {
+        var b = L.geoJSON(found.geometry).getBounds();
+        map.fitBounds(b.pad(0.5), { animate: true });
+        var labText = found.properties._label || found.properties.id;
+        showToast('Viewing: ' + labText);
+        var fc = found.properties.feature_class;
+        var grp = groups[fc];
+        if (grp) {
+          if (!map.hasLayer(grp)) map.addLayer(grp);
+          grp.eachLayer(function (l) {
+            var lp = (l.feature && l.feature.properties) || {};
+            if (String(lp.id) === String(found.properties.id)) {
+              setTimeout(function () { l.openPopup(); }, 350);
+            }
+          });
+        }
+      } catch (e) {}
+    }
+  }
+
+  function handleUrlHash() {
+    var hash = String(window.location.hash || '').trim();
+    if (!hash || hash === '#') return;
+    var mParcel = hash.match(/^#(?:parcel|id)=(.+)$/i);
+    if (mParcel) {
+      var targetId = decodeURIComponent(mParcel[1]).trim();
+      navigateToParcel(targetId);
+      return;
+    }
+    var mLoc = hash.match(/^#loc=([-\d.]+),([-\d.]+),?(\d+)?$/i);
+    if (mLoc) {
+      var lat = parseFloat(mLoc[1]);
+      var lng = parseFloat(mLoc[2]);
+      var z = mLoc[3] ? parseInt(mLoc[3], 10) : 15;
+      if (!isNaN(lat) && !isNaN(lng)) {
+        map.setView([lat, lng], z);
+      }
+    }
+  }
+
+  window.addEventListener('hashchange', handleUrlHash);
+
+  // Popup share button listener
+  map.on('popupopen', function (e) {
+    var el = e.popup && e.popup.getElement();
+    if (!el) return;
+    var btn = el.querySelector('.popup-share-btn');
+    if (!btn) return;
+    btn.onclick = function (ev) {
+      ev.stopPropagation();
+      var shareId = btn.getAttribute('data-share-id') || '';
+      var shareTitle = btn.getAttribute('data-share-title') || 'Swindon Green Corridor';
+      var url = window.location.origin + window.location.pathname + '#parcel=' + encodeURIComponent(shareId);
+      if (history.replaceState) {
+        history.replaceState(null, null, '#parcel=' + encodeURIComponent(shareId));
+      }
+      if (navigator.share) {
+        navigator.share({
+          title: 'Swindon Green Corridor - ' + shareTitle,
+          text: 'View this green space on the community map:',
+          url: url
+        }).catch(function () {});
+      } else {
+        copyTextToClipboard(url);
+        showToast('Link copied to clipboard!');
+      }
+    };
   });
+
+  loadParcels()
+    .then(function () { return loadCommunity(); })
+    .then(function () { return loadAncientWoodland(); })
+    .then(function () { return loadProw(); })
+    .catch(function () {})
+    .then(function () {
+      renderMyPending();
+      overlays['My pending (local, awaiting review)'] = myPendingLayer;
+      myPendingLayer.addTo(map);
+      buildLayersMenu();
+      handleUrlHash();
+    }).catch(function () {
+      var c = document.getElementById('count'); if (c) c.textContent = 'load error';
+    });
 
   // Search: parcel IDs/labels locally, plus Swindon place navigation via Nominatim.
   var box = document.getElementById('search');
@@ -1130,6 +1305,79 @@
   if (speciesSelect) speciesSelect.addEventListener('change', checkBadgerNotice);
   if (notesInput) notesInput.addEventListener('input', checkBadgerNotice);
 
+  // Photo Attachment & Client-Side EXIF Scrubbing
+  var photoInput = document.getElementById('c-photo');
+  var photoPreviewWrap = document.getElementById('photo-preview-wrap');
+  var photoPreviewImg = document.getElementById('photo-preview-img');
+  var photoRemoveBtn = document.getElementById('photo-remove-btn');
+  var currentScrubbedPhotoData = null;
+
+  function clearPhotoAttachment() {
+    currentScrubbedPhotoData = null;
+    if (photoInput) photoInput.value = '';
+    if (photoPreviewImg) photoPreviewImg.src = '';
+    if (photoPreviewWrap) photoPreviewWrap.style.display = 'none';
+  }
+
+  if (photoRemoveBtn) {
+    photoRemoveBtn.onclick = function () {
+      clearPhotoAttachment();
+      showToast('Attached photo removed.');
+    };
+  }
+
+  if (photoInput) {
+    photoInput.onchange = function (ev) {
+      var file = ev.target.files && ev.target.files[0];
+      if (!file) return;
+
+      if (!file.type || !file.type.startsWith('image/')) {
+        showToast('Please select a valid image file (JPEG, PNG).');
+        clearPhotoAttachment();
+        return;
+      }
+
+      showToast('Processing photo & stripping EXIF metadata...');
+      var reader = new FileReader();
+      reader.onload = function (e) {
+        var img = new Image();
+        img.onload = function () {
+          // Offscreen Canvas resizing & EXIF scrubbing
+          var maxDim = 1280;
+          var w = img.width;
+          var h = img.height;
+          if (w > maxDim || h > maxDim) {
+            if (w > h) {
+              h = Math.round((h * maxDim) / w);
+              w = maxDim;
+            } else {
+              w = Math.round((w * maxDim) / h);
+              h = maxDim;
+            }
+          }
+          var canvas = document.createElement('canvas');
+          canvas.width = w;
+          canvas.height = h;
+          var ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, w, h);
+
+          // toDataURL creates a fresh JPEG stream without EXIF/GPS tags
+          currentScrubbedPhotoData = canvas.toDataURL('image/jpeg', 0.82);
+
+          if (photoPreviewImg) photoPreviewImg.src = currentScrubbedPhotoData;
+          if (photoPreviewWrap) photoPreviewWrap.style.display = 'block';
+          showToast('Photo ready (EXIF location metadata scrubbed).');
+        };
+        img.onerror = function () {
+          showToast('Could not load image. Please try another file.');
+          clearPhotoAttachment();
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    };
+  }
+
   // Form submission (Send return)
   var form = document.getElementById('community-form');
   if (form) form.addEventListener('submit', function (ev) {
@@ -1158,6 +1406,14 @@
       notes: notesVal,
       contact: contactVal
     };
+
+    if (currentScrubbedPhotoData) {
+      attrs.photo_data = currentScrubbedPhotoData;
+      attrs.has_photo = true;
+      if (isBadger) {
+        attrs.photo_restricted = true;
+      }
+    }
 
     if (isBadger) {
       geom = snapToCouncilHqClient(geom);
@@ -1195,6 +1451,7 @@
       try { if (!map.hasLayer(myPendingLayer)) myPendingLayer.addTo(map); } catch (e) {}
       setResult('Offline: saved locally on device. Will auto-upload when back online.', 'ok');
       form.reset();
+      clearPhotoAttachment();
       checkBadgerNotice();
       clearDrawing();
       if (isBadger) {
@@ -1225,6 +1482,7 @@
           try { if (!map.hasLayer(myPendingLayer)) myPendingLayer.addTo(map); } catch (e) {}
           setResult('Thank you. Your return was queued for review.', 'ok');
           form.reset();
+          clearPhotoAttachment();
           checkBadgerNotice();
           clearDrawing();
           if (isBadger) {
@@ -1251,6 +1509,7 @@
         try { if (!map.hasLayer(myPendingLayer)) myPendingLayer.addTo(map); } catch (e) {}
         setResult('Saved locally on device (network unreachable). Will auto-upload when reconnected.', 'ok');
         form.reset();
+        clearPhotoAttachment();
         checkBadgerNotice();
         clearDrawing();
         showToast('Network error: saved locally. Will auto-upload when connection returns.');
