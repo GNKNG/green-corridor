@@ -1,0 +1,316 @@
+[
+  {
+    "id": "oak-and-furrows",
+    "title": "Oak & Furrows Wildlife Rescue (Swindon & Cricklade)",
+    "category": "injured_rescue",
+    "category_label": "Injured Animals & Rescues",
+    "badge": "Local Rescue - Swindon / Cricklade",
+    "phone": "01793 640136",
+    "alt_phone": "01793 751412",
+    "location": "Blakehill Nature Reserve, Malmesbury Road, Cricklade, SN6 6RH",
+    "summary": "Primary wildlife rehabilitation hospital serving Swindon and North Wiltshire. Admits over 4,000 casualties annually including hedgehogs, badgers, foxes, birds, and small mammals.",
+    "advice": [
+      "If you find an injured or grounded animal, call before moving it if safe to do so.",
+      "Containment: Gently place the casualty in a cardboard box lined with an old towel or newspaper. Ensure ventilation holes are punched from inside out.",
+      "Keep the animal in a warm, dark, and quiet room away from children and household pets.",
+      "Never offer cow's milk, bread, or forced water to a distressed wild animal."
+    ],
+    "links": [
+      {
+        "title": "Oak & Furrows / RSPCA North Wiltshire",
+        "url": "https://rspcanorthwilts.org.uk",
+        "desc": "Official hospital website, admission guidelines, and support."
+      }
+    ],
+    "tags": ["rescue", "injured", "swindon", "cricklade", "oak and furrows", "emergency", "hospital"]
+  },
+  {
+    "id": "wiltshire-wildlife-hospital",
+    "title": "Wiltshire Wildlife Hospital",
+    "category": "injured_rescue",
+    "category_label": "Injured Animals & Rescues",
+    "badge": "County Hospital - Wiltshire",
+    "phone": "07850 778752",
+    "alt_phone": "01980 629470",
+    "location": "Newton Tony, Salisbury, Wiltshire",
+    "summary": "24-hour voluntary emergency response and rehabilitation for injured wildlife across Wiltshire, dealing with deer, raptors, badgers, swans, and water birds.",
+    "advice": [
+      "Operates a 24-hour wildlife emergency mobile line; if unanswered immediately, send a text message with location details and casualty description.",
+      "For road casualty deer or badgers, do not approach an agitated animal directly; keep traffic safe and call for experienced rescuers.",
+      "Keep casualties warm and calm during transit."
+    ],
+    "links": [
+      {
+        "title": "Wiltshire Wildlife Hospital",
+        "url": "https://www.wiltshirewildlifehospital.co.uk",
+        "desc": "Emergency advice, rescue operations, and donation details."
+      }
+    ],
+    "tags": ["rescue", "wiltshire", "hospital", "deer", "badgers", "raptors", "salisbury"]
+  },
+  {
+    "id": "rspca-emergency",
+    "title": "RSPCA National Cruelty & Emergency Helpline",
+    "category": "injured_rescue",
+    "category_label": "Injured Animals & Rescues",
+    "badge": "National 24hr Line",
+    "phone": "0300 1234 999",
+    "summary": "National 24-hour reporting line for wild animals trapped in dangerous machinery, waterways, wire netting, or suffering suspected deliberate cruelty.",
+    "advice": [
+      "Use for trapped wildlife or when local rescue centres are unreachable.",
+      "Have what3words, GPS coordinates, or a precise landmark ready when calling.",
+      "Request an incident reference number to track response."
+    ],
+    "links": [
+      {
+        "title": "RSPCA Wildlife Casualty Guidance",
+        "url": "https://www.rspca.org.uk/adviceandwelfare/wildlife",
+        "desc": "Official national advice on what to do when discovering wild casualties."
+      }
+    ],
+    "tags": ["rspca", "cruelty", "national", "trapped", "helpline", "emergency"]
+  },
+  {
+    "id": "bat-conservation-trust",
+    "title": "Bat Conservation Trust - National Bat Helpline",
+    "category": "injured_rescue",
+    "category_label": "Injured Animals & Rescues",
+    "badge": "Specialist Rescue & Law",
+    "phone": "0345 1300 228",
+    "summary": "Authoritative national helpline for grounded, injured, or trapped bats, building work queries, and roost protections.",
+    "advice": [
+      "Any bat found grounded or exposed during daylight is in trouble and needs containment.",
+      "Safety: Always wear protective gardening gloves when touching a bat; never handle bare-handed.",
+      "Containment: Place a shoe box or small container over the bat, slide a piece of stiff card underneath, and secure with a tight lid with small air holes.",
+      "Put a clean bottle cap containing a few drops of water in the corner so it can drink if able."
+    ],
+    "links": [
+      {
+        "title": "Found a Bat Guidance (BCT)",
+        "url": "https://www.bats.org.uk/advice/found-a-bat",
+        "desc": "Step-by-step rescue protocol and UK bat carer network dispatch."
+      }
+    ],
+    "tags": ["bats", "rescue", "bct", "grounded bat", "roost", "law"]
+  },
+  {
+    "id": "help-wildlife-uk",
+    "title": "Help Wildlife UK - National Rescue Finder",
+    "category": "injured_rescue",
+    "category_label": "Injured Animals & Rescues",
+    "badge": "National Rescue Directory",
+    "summary": "Searchable online directory of verified independent wildlife rehabilitators, vets, and volunteer rescue groups across England and Wales.",
+    "advice": [
+      "Enter your exact postcode to locate the nearest available voluntary rescue or sanctuary.",
+      "Includes dedicated bird, hedgehog, and mammal specialists."
+    ],
+    "links": [
+      {
+        "title": "Help Wildlife Directory",
+        "url": "https://helpwildlife.co.uk",
+        "desc": "Find local wildlife rescues by postcode."
+      }
+    ],
+    "tags": ["directory", "finder", "vet", "rehabilitator", "local"]
+  },
+  {
+    "id": "badger-protection-law",
+    "title": "Badger Protection & Wildlife Crime Reporting",
+    "category": "protection_law",
+    "category_label": "Protection & Wildlife Law",
+    "badge": "Statutory Law - 1992 Act",
+    "phone": "101",
+    "alt_phone": "0800 555 111",
+    "summary": "Legal framework under the Protection of Badgers Act 1992 and protocols for reporting sett interference, persecution, or illicit earth-stopping.",
+    "advice": [
+      "The Law: It is a criminal offence to wilfully kill, injure, take, ill-treat a badger, or damage, destroy, block, or disturb an active sett.",
+      "Sett Discretion: Precise coordinates must never be published online, on open maps, or in public forums to guard against persecution.",
+      "Emergency: If a wildlife crime or sett interference is taking place now, call 999 immediately.",
+      "Reporting: Call Wiltshire Police on 101, ask for the Wildlife Crime Officer, and obtain an incident log number.",
+      "Anonymous reports: Call Crimestoppers anonymously on 0800 555 111."
+    ],
+    "links": [
+      {
+        "title": "Badger Trust - Report Sett Interference",
+        "url": "https://www.badgertrust.org.uk",
+        "desc": "Online crime reporting portal, legal guides, and educational materials."
+      },
+      {
+        "title": "Wiltshire Badger Group",
+        "url": "https://www.wiltshirebadgergroup.org.uk",
+        "desc": "Local county group monitoring setts, vaccinating, and advising on planning."
+      }
+    ],
+    "tags": ["badger", "sett", "law", "police", "crime", "1992 act", "wiltshire badger group"]
+  },
+  {
+    "id": "nesting-birds-law",
+    "title": "Nesting Birds & Hedgerow Protection",
+    "category": "protection_law",
+    "category_label": "Protection & Wildlife Law",
+    "badge": "Wildlife & Countryside Act 1981",
+    "summary": "Statutory protection for all wild birds, active nests, eggs, and countryside hedgerows.",
+    "advice": [
+      "All wild birds, their active nests, and eggs are protected under Section 1 of the Wildlife and Countryside Act 1981.",
+      "It is an offence to intentionally take, damage, or destroy the nest of any wild bird while it is being built or in active use.",
+      "No Hedge Cutting: Do not trim hedges, scrub, or trees during the core nesting season between 1 March and 31 August.",
+      "Hedgerow Regulations 1997: Countryside hedgerows over 20 metres in length require council consent prior to removal."
+    ],
+    "links": [
+      {
+        "title": "RSPB Wildlife and the Law",
+        "url": "https://www.rspb.org.uk/birds-and-wildlife/advice/wildlife-and-the-law",
+        "desc": "Plain-English guide to bird nesting protections and developer duties."
+      },
+      {
+        "title": "Swindon Borough Council Planning Enforcement",
+        "url": "https://www.swindon.gov.uk/planning",
+        "desc": "Report unauthorized tree works, TPO breaches, or hedgerow removal."
+      }
+    ],
+    "tags": ["birds", "hedgerow", "nests", "hedgerow regulations", "tpo", "planning"]
+  },
+  {
+    "id": "hedgehog-care",
+    "title": "Caring for Hedgehogs & Garden Corridors",
+    "category": "hedgehogs",
+    "category_label": "Hedgehogs",
+    "badge": "Species in Decline",
+    "phone": "01584 890801",
+    "summary": "Practical ways to support garden hedgehogs, establish linked corridor highways, provide safe food, and identify casualties.",
+    "advice": [
+      "What to Feed: Meat-based dog or cat wet food (chicken or beef), specialized hedgehog biscuits, or meat-based cat crunchies.",
+      "Water: Always provide fresh water in a shallow, stable dish. Water is vital during dry summer spells.",
+      "Lethal Foods: NEVER offer cow's milk or bread. Hedgehogs are lactose intolerant; milk causes severe dehydration and fatal enteritis.",
+      "Daylight Sightings: Hedgehogs are strictly nocturnal. Any hedgehog seen wandering in daylight, wobbling, coughing, or surrounded by flies is unwell and needs urgent rescue.",
+      "Autumn Hoglets: Any juvenile hedgehog weighing under 450 grams after late October lacks the fat reserves to survive winter hibernation and should be brought to Oak & Furrows.",
+      "Hedgehog Highway: Create a 13cm x 13cm (5x5 inch) hole at the base of boundary fences so hedgehogs can forage across their necessary 2km nightly range."
+    ],
+    "links": [
+      {
+        "title": "British Hedgehog Preservation Society",
+        "url": "https://www.britishhedgehogs.org.uk",
+        "desc": "Hedgehog highway templates, medical leaflets, and casualty guidelines."
+      },
+      {
+        "title": "Hedgehog Street",
+        "url": "https://www.hedgehogstreet.org",
+        "desc": "Log hedgehog highways and track sightings across your neighborhood."
+      }
+    ],
+    "tags": ["hedgehog", "feeding", "milk", "bread", "highway", "hoglet", "hibernation"]
+  },
+  {
+    "id": "bird-feeding-hygiene",
+    "title": "Feeding Garden Birds & Feeder Hygiene",
+    "category": "birds",
+    "category_label": "Birds",
+    "badge": "Garden Habitats",
+    "summary": "Guidance on nutritional bird foods by season, feeder safety standards, and preventing the spread of avian diseases.",
+    "advice": [
+      "Recommended Foods: Sunflower hearts (high energy, no waste husks), nyjer seeds (for finches), pinhead oatmeal, and live/dried mealworms.",
+      "High-Energy Winter Feeding: Calorie-dense suet cakes and fat blocks are essential during cold snaps.",
+      "Remove Netting: ALWAYS remove and discard plastic mesh nets from fat balls before hanging; mesh snags bird claws and causes leg amputation.",
+      "No Loose Peanuts in Spring: Never put loose whole peanuts in feeders during breeding season (April-July); parent birds may feed them to chicks, causing choking.",
+      "Feeder Hygiene: Avian trichomonosis and salmonella spread rapidly at dirty feeding stations. Clean feeders and tables weekly with pet-safe disinfectant.",
+      "Disease Break: If sick, lethargic, or fluffed-up greenfinches/chaffinches are seen, suspend feeding and bird baths for 2 to 3 weeks to break contagion."
+    ],
+    "links": [
+      {
+        "title": "RSPB Bird Feeding Guide",
+        "url": "https://www.rspb.org.uk/birds-and-wildlife/advice/how-you-can-help-birds/feeding-birds",
+        "desc": "Comprehensive guide to feeder placement, food types, and hygiene."
+      },
+      {
+        "title": "British Trust for Ornithology (BTO) Garden BirdWatch",
+        "url": "https://www.bto.org",
+        "desc": "Participate in nationwide garden bird science and disease monitoring."
+      }
+    ],
+    "tags": ["birds", "feeding", "seeds", "sunflower hearts", "suet", "hygiene", "trichomonosis"]
+  },
+  {
+    "id": "badger-feeding-coexistence",
+    "title": "Badgers: Diet, Responsible Feeding & Water",
+    "category": "badgers",
+    "category_label": "Badgers",
+    "badge": "Foraging & Ecology",
+    "summary": "Understanding natural badger ecology, seasonal feeding realities, and avoiding habituation or nuisance in residential areas.",
+    "advice": [
+      "Natural Diet: Earthworms form over 50% of a badger's natural food intake, supplemented by beetles, acorns, bulbs, roots, and fallen orchard fruit.",
+      "Do They Need Feeding?: Badgers are resourceful foragers and rarely need supplementary feeding. Over-feeding causes dependency and can attract rats.",
+      "Safe Supplementary Foods: During prolonged summer droughts or hard ground frosts when earthworms cannot be reached, small amounts of raw unsalted peanuts, kibbled maize, or apple/pear slices may be provided.",
+      "What NOT to Feed: Never leave raw meat, bones, cooked poultry, bread, or sweet confectionery. These cause digestive illness and conflict with domestic pets.",
+      "Ground Water: Keep a heavy, shallow ceramic dish of fresh tap water at ground level. Clean and refill daily."
+    ],
+    "links": [
+      {
+        "title": "Badger Trust - Living with Badgers",
+        "url": "https://www.badgertrust.org.uk/badgers-and-gardens",
+        "desc": "Co-existence guidelines, garden advice, and legal protection."
+      }
+    ],
+    "tags": ["badger", "diet", "peanuts", "earthworms", "feeding", "water"]
+  },
+  {
+    "id": "water-and-ponds",
+    "title": "Wildlife Ponds, Escape Ramps & Drought Water",
+    "category": "water_ponds",
+    "category_label": "Water & Ponds",
+    "badge": "Wetland Habitats",
+    "summary": "Designing wildlife-friendly garden ponds, preventing small mammal drownings, and maintaining clean water sources during heatwaves.",
+    "advice": [
+      "Sloping Banks: Always ensure at least one side of a pond has a shallow, gently sloping stone or pebble beach. This enables hedgehogs, frogs, and emerging dragonflies to climb out safely.",
+      "Escape Ramps: For existing steep-sided ponds, rain butts, or cattle troughs, install a rough wooden plank or wire ramp wrapped in hessian.",
+      "No Fish in Wildlife Ponds: Ornamental fish (goldfish, koi) consume amphibian eggs, tadpoles, and aquatic insect larvae.",
+      "Native Oxygenators: Plant native Hornwort (Ceratophyllum demersum) and Water Crowfoot. Never introduce invasive alien weeds like Crassula helmsii or Floating Pennywort.",
+      "Bird & Pollinator Saucers: Place shallow glazed dishes at ground level and elevated on pedestals. Place flat stones in the center so drinking bees and butterflies cannot submerge."
+    ],
+    "links": [
+      {
+        "title": "Froglife - Just Add Water",
+        "url": "https://www.froglife.org/info-advice/just-add-water",
+        "desc": "Step-by-step wildlife pond construction guide and amphibian lifecycle info."
+      },
+      {
+        "title": "Freshwater Habitats Trust",
+        "url": "https://freshwaterhabitats.org.uk",
+        "desc": "Clean water conservation and garden pond ecology."
+      }
+    ],
+    "tags": ["pond", "water", "escape ramp", "frogs", "newts", "dragonfly", "drought"]
+  },
+  {
+    "id": "insects-and-native-plants",
+    "title": "Insects, Pollinators & Nectar Plants",
+    "category": "insects_plants",
+    "category_label": "Insects & Plants",
+    "badge": "Biodiversity Corridors",
+    "summary": "Selecting high-yield native plants, managing verges for pollinators, maintaining deadwood, and phasing out harmful chemical pesticides.",
+    "advice": [
+      "Continuous Nectar Calendar: Plant flowers that bloom sequentially from March through October (e.g. Primrose, Pulmonaria, Bird's-foot Trefoil, Field Scabious, Knapweed).",
+      "Ivy is Vital: Mature flowering ivy (Hedera helix) in September to November is the single most critical late nectar and pollen source for hoverflies, solitary bees, and butterflies preparing for winter.",
+      "Deadwood Habitats: Retain log piles and decaying wood in damp, shady garden corners. Deadwood supports over 2,000 UK insect species including stag beetles.",
+      "No Mow May & Relaxed Verges: Leaving grass to flower until late summer allows clover, dandelions, and trefoils to feed thousands of pollinators.",
+      "Pesticide Elimination: Avoid all chemical slug pellets (metaldehyde/ferric phosphate), weedkillers, and neonicotinoid pesticides, which bioaccumulate and kill thrushes, frogs, and hedgehogs."
+    ],
+    "links": [
+      {
+        "title": "Buglife - The Invertebrate Conservation Trust",
+        "url": "https://www.buglife.org.uk",
+        "desc": "B-Lines national insect pathway project and pollinator planting advice."
+      },
+      {
+        "title": "Bumblebee Conservation Trust",
+        "url": "https://www.bumblebeeconservation.org",
+        "desc": "Identification guides and garden bumblebee forage planners."
+      },
+      {
+        "title": "Plantlife - Wild Plant Charity",
+        "url": "https://www.plantlife.org.uk",
+        "desc": "No Mow May campaigns and road verge management guides."
+      }
+    ],
+    "tags": ["insects", "pollinators", "ivy", "deadwood", "flowers", "no mow may", "slug pellets"]
+  }
+]

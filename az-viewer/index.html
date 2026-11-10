@@ -13,7 +13,7 @@
 <link rel="apple-touch-icon" href="icons/icon-180.png">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <link rel="stylesheet" href="https://unpkg.com/@geoman-io/leaflet-geoman-free@2.16.0/dist/leaflet-geoman.css">
-<link rel="stylesheet" href="style.css?v=32">
+<link rel="stylesheet" href="style.css?v=33">
 </head>
 <body>
 
@@ -24,6 +24,10 @@
     <span class="app-badge">DRAFT</span>
   </div>
   <div class="top-bar-right">
+    <button id="library-toggle-btn" class="top-btn" aria-label="Wildlife and Habitat Library">
+      <svg class="top-btn-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+      <span class="top-btn-label">Library</span>
+    </button>
     <button id="help-toggle-btn" class="top-btn" aria-label="Help and Surveyor Guide">
       <span class="top-btn-icon">&#9432;</span>
       <span class="top-btn-label">Help</span>
@@ -90,6 +94,38 @@
         <p>Any badger record submitted here is <strong>automatically snapped to Swindon Borough Council Civic Offices (Euclid Street)</strong> across the entire borough before leaving your phone. Precise coordinates are never stored or published.</p>
         <p>Detailed confidential records of protected species should be submitted directly to Swindon Borough Council ecology officers.</p>
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- Floating Wildlife & Habitat Library Dialog -->
+<div id="library-modal" class="help-modal" hidden>
+  <div class="help-modal-content library-modal-content">
+    <div class="help-modal-header">
+      <div class="lib-header-title">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle; margin-right:4px;"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+        <strong>Wildlife &amp; Habitat Library</strong>
+      </div>
+      <button id="library-close-btn" class="help-close-btn" aria-label="Close library">&times;</button>
+    </div>
+    <div class="library-search-strip">
+      <input type="text" id="library-search" class="library-search-input" placeholder="Search advice, emergency numbers, or species (e.g. hedgehog, seeds, sett)..." autocomplete="off">
+    </div>
+    <div id="library-tabs" class="library-tabs-bar" role="tablist">
+      <button type="button" class="lib-tab active" data-cat="all">All Topics</button>
+      <button type="button" class="lib-tab" data-cat="injured_rescue">Injured &amp; Rescues</button>
+      <button type="button" class="lib-tab" data-cat="protection_law">Protection &amp; Law</button>
+      <button type="button" class="lib-tab" data-cat="hedgehogs">Hedgehogs</button>
+      <button type="button" class="lib-tab" data-cat="birds">Birds</button>
+      <button type="button" class="lib-tab" data-cat="badgers">Badgers</button>
+      <button type="button" class="lib-tab" data-cat="water_ponds">Water &amp; Ponds</button>
+      <button type="button" class="lib-tab" data-cat="insects_plants">Insects &amp; Plants</button>
+    </div>
+    <div id="library-list" class="help-modal-body library-modal-body">
+      <p class="sub" style="text-align:center; padding:18px;">Loading wildlife directory...</p>
+    </div>
+    <div class="library-modal-footer">
+      <span>Curated references &bull; Available offline &bull; Rescues verified Nov 2026</span>
     </div>
   </div>
 </div>
@@ -187,6 +223,17 @@
         </div>
         <p class="sub" style="margin-top: 5px; font-size: 11.5px; line-height: 1.35;">
           Install on phone (PWA), real-time GPS tracking, offline field surveying, and protected wildlife rules.
+        </p>
+      </div>
+
+      <!-- Wildlife & Habitat Library Card -->
+      <div class="panel-card library-teaser-card">
+        <div class="flex-between">
+          <strong style="color: #1f4a2c; font-size: 13px;">Wildlife &amp; Habitat Library</strong>
+          <button type="button" id="menu-library-btn" class="btn btn-sm btn-muted" title="Open wildlife rescue contacts, feeding advice, and species law">Browse</button>
+        </div>
+        <p class="sub" style="margin-top: 5px; font-size: 11.5px; line-height: 1.35;">
+          Local rescue hospitals (Swindon / Cricklade), feeding advice (birds, hedgehogs, badgers), ponds, and native planting. Available offline.
         </p>
       </div>
 
@@ -290,6 +337,6 @@
 <script>window.COMMUNITY_SUBMIT_URL = 'https://twilight-violet-8787.danmillerarchaeology.workers.dev';</script>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://unpkg.com/@geoman-io/leaflet-geoman-free@2.16.0/dist/leaflet-geoman.min.js"></script>
-<script src="app.js?v=32"></script>
+<script src="app.js?v=33"></script>
 </body>
 </html>

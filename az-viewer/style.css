@@ -184,6 +184,214 @@ body {
   background: #f0fdf4;
   border-color: #bbf7d0;
 }
+.library-teaser-card {
+  background: #f4f7f1;
+  border-color: #c4d4be;
+}
+
+/* --- Wildlife & Habitat Library Modal --- */
+.library-modal-content {
+  width: 660px;
+  max-height: 90vh;
+  max-height: 90dvh;
+}
+.lib-header-title {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.library-search-strip {
+  padding: 10px 14px 6px;
+  background: #ffffff;
+  border-bottom: 1px solid #eef2e9;
+}
+.library-search-input {
+  width: 100%;
+  padding: 7px 10px;
+  border: 1px solid #8ca684;
+  border-radius: 5px;
+  font-size: 13px;
+  color: #1e2922;
+  background: #fdfcf7;
+}
+.library-search-input:focus {
+  outline: none;
+  border-color: #1f4a2c;
+  box-shadow: 0 0 0 2px rgba(31,74,44,0.16);
+}
+.library-tabs-bar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  background: #fbf7ec;
+  border-bottom: 1px solid #e2ebd8;
+  overflow-x: auto;
+  flex-shrink: 0;
+  -webkit-overflow-scrolling: touch;
+}
+.lib-tab {
+  background: #ffffff;
+  color: #2b3e27;
+  border: 1px solid #cbd5e1;
+  border-radius: 14px;
+  padding: 4px 10px;
+  font-size: 11.5px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.12s ease;
+}
+.lib-tab:hover {
+  background: #edf5ea;
+  border-color: #7c9f70;
+}
+.lib-tab.active {
+  background: #1f4a2c;
+  color: #ffffff;
+  border-color: #14351e;
+}
+.library-modal-body {
+  padding: 14px;
+  gap: 12px;
+}
+.lib-card {
+  background: #ffffff;
+  border: 1px solid #d4dfce;
+  border-radius: 7px;
+  padding: 12px 14px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+}
+.lib-card-injured_rescue {
+  border-left: 4px solid #b91c1c;
+}
+.lib-card-protection_law {
+  border-left: 4px solid #b45309;
+}
+.lib-card-hedgehogs {
+  border-left: 4px solid #78350f;
+}
+.lib-card-birds {
+  border-left: 4px solid #0284c7;
+}
+.lib-card-badgers {
+  border-left: 4px solid #334155;
+}
+.lib-card-water_ponds {
+  border-left: 4px solid #0369a1;
+}
+.lib-card-insects_plants {
+  border-left: 4px solid #15803d;
+}
+.lib-card-top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  margin-bottom: 5px;
+}
+.lib-badge {
+  font-size: 10.5px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 4px;
+  background: #edf5ea;
+  color: #1f4a2c;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+.lib-badge-injured_rescue {
+  background: #fee2e2;
+  color: #991b1b;
+}
+.lib-badge-protection_law {
+  background: #fef3c7;
+  color: #92400e;
+}
+.lib-card h3 {
+  font-size: 14px;
+  font-weight: 700;
+  color: #14351e;
+  margin: 2px 0 6px;
+}
+.lib-summary {
+  font-size: 12.5px;
+  color: #334155;
+  margin-bottom: 8px;
+}
+.lib-phone-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+.lib-phone-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: #15803d;
+  color: #ffffff !important;
+  text-decoration: none;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 5px;
+}
+.lib-phone-btn:hover {
+  background: #166534;
+}
+.lib-location {
+  font-size: 11.5px;
+  color: #475569;
+  background: #f8fafc;
+  padding: 4px 8px;
+  border-radius: 4px;
+  margin-bottom: 8px;
+  border: 1px solid #e2e8f0;
+}
+.lib-advice-list {
+  margin: 0 0 8px 16px;
+  padding: 0;
+  font-size: 12px;
+  color: #1e293b;
+}
+.lib-advice-list li {
+  margin-bottom: 4px;
+  line-height: 1.4;
+}
+.lib-links-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding-top: 6px;
+  border-top: 1px solid #eef2e9;
+}
+.lib-ext-link {
+  display: inline-block;
+  font-size: 12px;
+  font-weight: 600;
+  color: #15803d;
+  text-decoration: none;
+}
+.lib-ext-link:hover {
+  text-decoration: underline;
+  color: #14532d;
+}
+.lib-link-desc {
+  font-size: 11px;
+  color: #64748b;
+  margin-left: 4px;
+  font-weight: 400;
+}
+.library-modal-footer {
+  padding: 8px 14px;
+  background: #fbf7ec;
+  border-top: 1px solid #e2ebd8;
+  font-size: 11px;
+  color: #64748b;
+  text-align: center;
+}
 
 /* --- Floating Layers Dropdown --- */
 .layers-dropdown {
@@ -905,5 +1113,29 @@ body {
   }
   .tb-label {
     font-size: 8px;
+  }
+}
+
+@media (max-width: 560px) {
+  #top-bar {
+    padding: 0 8px;
+  }
+  .app-title {
+    font-size: 12px;
+    max-width: 120px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .app-badge {
+    display: none;
+  }
+  .top-bar-right {
+    gap: 4px;
+  }
+  .top-btn {
+    padding: 4px 6px;
+    font-size: 11px;
+    gap: 3px;
   }
 }

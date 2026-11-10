@@ -91,6 +91,7 @@
   var helpPwaInstallBtn = document.getElementById('help-pwa-install-btn');
 
   function openHelpModal() {
+    if (typeof closeLibraryModal === 'function') closeLibraryModal();
     if (!helpModal) return;
     helpModal.hidden = false;
     if (helpBtn) helpBtn.classList.add('active');
@@ -117,9 +118,201 @@
       closeHelpModal();
     }
   };
+
+  // Wildlife & Habitat Library Modal
+  var libraryBtn = document.getElementById('library-toggle-btn');
+  var libraryModal = document.getElementById('library-modal');
+  var libraryClose = document.getElementById('library-close-btn');
+  var menuLibraryBtn = document.getElementById('menu-library-btn');
+  var librarySearch = document.getElementById('library-search');
+  var libraryTabs = document.getElementById('library-tabs');
+  var libraryList = document.getElementById('library-list');
+  var libraryItems = null;
+  var libraryLoadPending = false;
+  var currentLibCategory = 'all';
+
+  function openLibraryModal(optCat) {
+    closeHelpModal();
+    if (layersMenu) layersMenu.hidden = true;
+    if (layersBtn) layersBtn.classList.remove('active');
+    if (optCat && libraryTabs) {
+      var targetTab = libraryTabs.querySelector('[data-cat="' + optCat + '"]');
+      if (targetTab) {
+        currentLibCategory = optCat;
+        var allTabs = libraryTabs.querySelectorAll('.lib-tab');
+        for (var i = 0; i < allTabs.length; i++) {
+          allTabs[i].classList.toggle('active', allTabs[i] === targetTab);
+        }
+      }
+    }
+    if (!libraryModal) return;
+    libraryModal.hidden = false;
+    if (libraryBtn) libraryBtn.classList.add('active');
+    loadLibraryData();
+  }
+  function closeLibraryModal() {
+    if (!libraryModal) return;
+    libraryModal.hidden = true;
+    if (libraryBtn) libraryBtn.classList.remove('active');
+  }
+  function safeExtUrl(u) {
+    var s = String(u || '').trim();
+    if (/^https?:\/\//i.test(s)) return s;
+    return '#';
+  }
+  function loadLibraryData() {
+    if (libraryItems) {
+      renderLibrary();
+      return;
+    }
+    if (libraryLoadPending) return;
+    libraryLoadPending = true;
+    fetch('data/library.json')
+      .then(function (r) {
+        if (!r.ok) throw new Error('HTTP ' + r.status);
+        return r.json();
+      })
+      .then(function (items) {
+        libraryItems = Array.isArray(items) ? items : [];
+        libraryLoadPending = false;
+        renderLibrary();
+      })
+      .catch(function () {
+        libraryLoadPending = false;
+        if (libraryList) {
+          libraryList.innerHTML = '<div class="help-section help-section-warning"><p>Could not load library file offline. Please connect once to cache the library or reload the page.</p></div>';
+        }
+      });
+  }
+  function renderLibrary() {
+    if (!libraryList || !libraryItems) return;
+    var q = librarySearch ? String(librarySearch.value || '').trim().toLowerCase() : '';
+    var matches = [];
+    for (var i = 0; i < libraryItems.length; i++) {
+      var item = libraryItems[i];
+      if (currentLibCategory !== 'all' && item.category !== currentLibCategory) continue;
+      if (q) {
+        var hay = [
+          item.title,
+          item.category_label,
+          item.badge,
+          item.summary,
+          item.phone,
+          item.alt_phone,
+          item.location,
+          (item.advice || []).join(' '),
+          (item.tags || []).join(' ')
+        ].join(' ').toLowerCase();
+        if (hay.indexOf(q) === -1) continue;
+      }
+      matches.push(item);
+    }
+
+    if (!matches.length) {
+      libraryList.innerHTML = '<div class="help-section" style="text-align:center;"><p class="sub">No entries found matching "' + esc(q) + '".</p><button type="button" id="lib-reset-btn" class="btn btn-sm btn-muted">Show all topics</button></div>';
+      var resetBtn = document.getElementById('lib-reset-btn');
+      if (resetBtn) {
+        resetBtn.onclick = function () {
+          currentLibCategory = 'all';
+          if (librarySearch) librarySearch.value = '';
+          if (libraryTabs) {
+            var tabs = libraryTabs.querySelectorAll('.lib-tab');
+            for (var t = 0; t < tabs.length; t++) {
+              tabs[t].classList.toggle('active', tabs[t].getAttribute('data-cat') === 'all');
+            }
+          }
+          renderLibrary();
+        };
+      }
+      return;
+    }
+
+    var html = [];
+    for (var m = 0; m < matches.length; m++) {
+      var c = matches[m];
+      var catCls = esc(c.category || 'general');
+      var badge = c.badge || c.category_label || '';
+      var block = '<article class="lib-card lib-card-' + catCls + '">';
+      block += '<div class="lib-card-top"><span class="lib-badge lib-badge-' + catCls + '">' + esc(badge) + '</span></div>';
+      block += '<h3>' + esc(c.title) + '</h3>';
+      if (c.summary) {
+        block += '<p class="lib-summary">' + esc(c.summary) + '</p>';
+      }
+      if (c.phone || c.alt_phone) {
+        block += '<div class="lib-phone-row">';
+        if (c.phone) {
+          var telMain = String(c.phone).replace(/[^+\d]/g, '');
+          block += '<a href="tel:' + esc(telMain) + '" class="lib-phone-btn">Call ' + esc(c.phone) + '</a>';
+        }
+        if (c.alt_phone) {
+          var telAlt = String(c.alt_phone).replace(/[^+\d]/g, '');
+          block += '<a href="tel:' + esc(telAlt) + '" class="lib-phone-btn">Alt: ' + esc(c.alt_phone) + '</a>';
+        }
+        block += '</div>';
+      }
+      if (c.location) {
+        block += '<div class="lib-location"><strong>Location:</strong> ' + esc(c.location) + '</div>';
+      }
+      if (Array.isArray(c.advice) && c.advice.length) {
+        block += '<ul class="lib-advice-list">';
+        for (var a = 0; a < c.advice.length; a++) {
+          block += '<li>' + esc(c.advice[a]) + '</li>';
+        }
+        block += '</ul>';
+      }
+      if (Array.isArray(c.links) && c.links.length) {
+        block += '<div class="lib-links-list">';
+        for (var l = 0; l < c.links.length; l++) {
+          var lk = c.links[l];
+          block += '<div><a href="' + esc(safeExtUrl(lk.url)) + '" target="_blank" rel="noopener noreferrer" class="lib-ext-link">' + esc(lk.title) + ' &rarr;</a>';
+          if (lk.desc) {
+            block += '<span class="lib-link-desc">' + esc(lk.desc) + '</span>';
+          }
+          block += '</div>';
+        }
+        block += '</div>';
+      }
+      block += '</article>';
+      html.push(block);
+    }
+    libraryList.innerHTML = html.join('');
+  }
+
+  if (libraryBtn) libraryBtn.onclick = function (ev) {
+    ev.stopPropagation();
+    if (libraryModal && !libraryModal.hidden) closeLibraryModal();
+    else openLibraryModal();
+  };
+  if (menuLibraryBtn) menuLibraryBtn.onclick = function (ev) {
+    ev.stopPropagation();
+    openLibraryModal();
+  };
+  if (libraryClose) libraryClose.onclick = function () {
+    closeLibraryModal();
+  };
+  if (libraryModal) libraryModal.onclick = function (ev) {
+    if (ev.target === libraryModal) {
+      closeLibraryModal();
+    }
+  };
+  if (librarySearch) librarySearch.addEventListener('input', function () {
+    renderLibrary();
+  });
+  if (libraryTabs) libraryTabs.addEventListener('click', function (ev) {
+    var btn = ev.target.closest ? ev.target.closest('.lib-tab') : null;
+    if (!btn) return;
+    currentLibCategory = btn.getAttribute('data-cat') || 'all';
+    var tabs = libraryTabs.querySelectorAll('.lib-tab');
+    for (var i = 0; i < tabs.length; i++) {
+      tabs[i].classList.toggle('active', tabs[i] === btn);
+    }
+    renderLibrary();
+  });
+
   document.addEventListener('keydown', function (ev) {
-    if (ev.key === 'Escape' && helpModal && !helpModal.hidden) {
-      closeHelpModal();
+    if (ev.key === 'Escape') {
+      if (helpModal && !helpModal.hidden) closeHelpModal();
+      if (libraryModal && !libraryModal.hidden) closeLibraryModal();
     }
   });
 
@@ -821,6 +1014,12 @@
   function handleUrlHash() {
     var hash = String(window.location.hash || '').trim();
     if (!hash || hash === '#') return;
+    var mLib = hash.match(/^#library(?:=(.+))?$/i);
+    if (mLib) {
+      var cat = mLib[1] ? decodeURIComponent(mLib[1]).trim() : 'all';
+      openLibraryModal(cat);
+      return;
+    }
     var mParcel = hash.match(/^#(?:parcel|id)=(.+)$/i);
     if (mParcel) {
       var targetId = decodeURIComponent(mParcel[1]).trim();

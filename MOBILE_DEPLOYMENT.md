@@ -104,3 +104,13 @@ Under all deployment options (Web, PWA, APK):
 - **Natural England Ancient Woodland Inventory**: 51 irreplaceable ancient semi-natural woodland sites in Swindon (NPPF protected).
 - **Swindon Borough Public Rights of Way (PRoW)**: 684 official legal footpaths, bridleways, and byways across Swindon Borough.
 
+---
+
+## 6. Wildlife & Habitat Library (v=33)
+
+- Accessible via **Library** in the top navigation bar or inside the main Menu (`Browse`).
+- Cached offline via `data/library.json` in Service Worker (`gc-viewer-v5`).
+- Covers local Wiltshire/Swindon wildlife rescues (Oak & Furrows `01793 640136`, Wiltshire Wildlife Hospital `07850 778752`), statutory protection (Badgers Act 1992, Wildlife & Countryside Act 1981), feeding guidelines (hedgehogs, birds, badgers), pond escape ramps, and pollinator planting.
+- Supports live keyword filtering, category tabs, direct mobile calling (`tel:` links), and hash deep-linking (`#library=hedgehogs`).
+
+
