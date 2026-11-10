@@ -1,0 +1,54 @@
+{
+  "type": "Feature",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          -1.809455,
+          51.565096
+        ],
+        [
+          -1.810058,
+          51.565814
+        ],
+        [
+          -1.810778,
+          51.565341
+        ],
+        [
+          -1.811277,
+          51.564867
+        ],
+        [
+          -1.809525,
+          51.564197
+        ],
+        [
+          -1.809153,
+          51.564393
+        ],
+        [
+          -1.809696,
+          51.56493
+        ],
+        [
+          -1.809455,
+          51.565096
+        ]
+      ]
+    ]
+  },
+  "properties": {
+    "feature_class": "community_suggestion",
+    "status": "pending_review",
+    "submitted_at": "2026-11-10T17:51:18Z",
+    "geometry_kind": "area",
+    "place": "Raybrook Meadows",
+    "street_area": "",
+    "broad_type": "woodland",
+    "notes": "400 trees planted plus hedging. Area left to rewild. Path due for repair. Parish taken on upkeep.",
+    "contact_provided": true,
+    "ip_hash": "866467df54aa2de9"
+  }
+}
