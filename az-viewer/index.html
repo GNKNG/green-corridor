@@ -13,7 +13,7 @@
 <link rel="apple-touch-icon" href="icons/icon-180.png">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <link rel="stylesheet" href="https://unpkg.com/@geoman-io/leaflet-geoman-free@2.16.0/dist/leaflet-geoman.css">
-<link rel="stylesheet" href="style.css?v=30">
+<link rel="stylesheet" href="style.css?v=31">
 </head>
 <body>
 
@@ -24,6 +24,10 @@
     <span class="app-badge">DRAFT</span>
   </div>
   <div class="top-bar-right">
+    <button id="help-toggle-btn" class="top-btn" aria-label="Help and Surveyor Guide">
+      <span class="top-btn-icon">&#9432;</span>
+      <span class="top-btn-label">Help</span>
+    </button>
     <button id="layers-toggle-btn" class="top-btn" aria-label="Toggle map layers">
       <span class="top-btn-icon">&#9638;</span>
       <span class="top-btn-label">Layers</span>
@@ -34,6 +38,59 @@
     </button>
   </div>
 </header>
+
+<!-- Floating Help & Surveyor Guide Dialog -->
+<div id="help-modal" class="help-modal" hidden>
+  <div class="help-modal-content">
+    <div class="help-modal-header">
+      <strong>Help &amp; Surveyor Guide</strong>
+      <button id="help-close-btn" class="help-close-btn" aria-label="Close guide">&times;</button>
+    </div>
+    <div class="help-modal-body">
+      <div class="help-section">
+        <h3>&#128241; Install as a Phone App (PWA)</h3>
+        <p>You can install this map on your smartphone as a standalone app without going to an app store:</p>
+        <ul>
+          <li><strong>Android (Chrome / Firefox):</strong> Tap the <strong>&#8942;</strong> menu button &rarr; tap <strong>"Install app"</strong> or <strong>"Add to Home screen"</strong>.</li>
+          <li><strong>iPhone / iPad (Safari):</strong> Tap the <strong>Share</strong> button (box with up arrow) &rarr; scroll down &rarr; tap <strong>"Add to Home Screen"</strong>.</li>
+        </ul>
+        <p class="help-tip">Once installed, it opens full screen with its own green corridor icon and works completely offline.</p>
+        <button type="button" id="help-pwa-install-btn" class="btn btn-sm btn-primary" style="display:none; margin-top:8px;">Install App Now</button>
+      </div>
+
+      <div class="help-section">
+        <h3>&#128225; Real-Time GPS Tracking</h3>
+        <p>When walking in the field, tap the <strong>GPS (&#9678;)</strong> button on the left map toolbar. A pulsing blue dot with an accuracy ring will show your live position. Tap again to turn off and save battery.</p>
+      </div>
+
+      <div class="help-section">
+        <h3>&#128230; Offline Surveying &amp; Map Packs</h3>
+        <p>If you are walking in woodland or rural corridors with no phone signal:</p>
+        <ul>
+          <li><strong>Save View Offline:</strong> Before setting out, open <strong>Layers</strong> &rarr; <strong>Cache View</strong> to store map tiles for your route.</li>
+          <li><strong>Offline Submissions:</strong> Any areas or pins you draw while offline will save safely to your phone storage. As soon as you reconnect to mobile data or Wi-Fi, they upload automatically.</li>
+          <li><strong>Import Custom Packs:</strong> Tap <strong>Import Pack</strong> in the Layers menu to load local community <code>.geojson</code> or <code>.json</code> map files.</li>
+        </ul>
+      </div>
+
+      <div class="help-section">
+        <h3>&#9998; How to Annotate &amp; Submit</h3>
+        <ul>
+          <li><strong>Area (&#9645;):</strong> Tap the map to outline a green corridor or habitat area. Double-tap or click Finish to complete.</li>
+          <li><strong>Marker (&#9873;):</strong> Tap the map to flag a specific habitat feature, veteran tree, pond, or verge.</li>
+          <li><strong>Measure / Calc Area:</strong> Check boundary lengths and estimated area in hectares.</li>
+        </ul>
+      </div>
+
+      <div class="help-section help-section-warning">
+        <h3>&#9888; Protected Species &amp; Badger Law</h3>
+        <p>Under the <em>Protection of Badgers Act 1992</em>, it is a criminal offence to publish the precise location of a badger sett.</p>
+        <p>Any badger record submitted here is <strong>automatically snapped to Swindon Borough Council Civic Offices (Euclid Street)</strong> across the entire borough before leaving your phone. Precise coordinates are never stored or published.</p>
+        <p>Detailed confidential records of protected species should be submitted directly to Swindon Borough Council ecology officers.</p>
+      </div>
+    </div>
+  </div>
+</div>
 
 <!-- Floating Layers Dropdown Dialog -->
 <div id="layers-menu" class="layers-dropdown" hidden>
@@ -118,6 +175,17 @@
         <strong>DRAFT / NOTHING FILED.</strong>
         <p>Indicative only, not a legal boundary. Not a designation, survey, approval, ownership, or group claim. Adopted EN1 = policy context; proposed/emerging areas are draft and indicative only.</p>
         <div class="disclaimer-date">Data date: 2026-11-08</div>
+      </div>
+
+      <!-- App & Surveyor Quick Guide Card -->
+      <div class="panel-card help-teaser-card">
+        <div class="flex-between">
+          <strong style="color: #1f4a2c; font-size: 13px;">App &amp; Surveyor Guide</strong>
+          <button type="button" id="menu-help-btn" class="btn btn-sm btn-muted" title="Open help and phone app instructions">How to use</button>
+        </div>
+        <p class="sub" style="margin-top: 5px; font-size: 11.5px; line-height: 1.35;">
+          Install on phone (PWA), real-time GPS tracking, offline field surveying, and protected wildlife rules.
+        </p>
       </div>
 
       <!-- Search Section -->
@@ -210,6 +278,6 @@
 <script>window.COMMUNITY_SUBMIT_URL = 'https://twilight-violet-8787.danmillerarchaeology.workers.dev';</script>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://unpkg.com/@geoman-io/leaflet-geoman-free@2.16.0/dist/leaflet-geoman.min.js"></script>
-<script src="app.js?v=30"></script>
+<script src="app.js?v=31"></script>
 </body>
 </html>

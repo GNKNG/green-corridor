@@ -83,10 +83,62 @@
     if (layersMenu) layersMenu.hidden = true;
     if (layersBtn) layersBtn.classList.remove('active');
   };
-  document.addEventListener('click', function (ev) {
-    if (layersMenu && !layersMenu.hidden && !layersMenu.contains(ev.target) && ev.target !== layersBtn && !layersBtn.contains(ev.target)) {
-      layersMenu.hidden = true;
-      if (layersBtn) layersBtn.classList.remove('active');
+  // Help & Surveyor Guide Modal
+  var helpBtn = document.getElementById('help-toggle-btn');
+  var helpModal = document.getElementById('help-modal');
+  var helpClose = document.getElementById('help-close-btn');
+  var menuHelpBtn = document.getElementById('menu-help-btn');
+  var helpPwaInstallBtn = document.getElementById('help-pwa-install-btn');
+
+  function openHelpModal() {
+    if (!helpModal) return;
+    helpModal.hidden = false;
+    if (helpBtn) helpBtn.classList.add('active');
+  }
+  function closeHelpModal() {
+    if (!helpModal) return;
+    helpModal.hidden = true;
+    if (helpBtn) helpBtn.classList.remove('active');
+  }
+  if (helpBtn) helpBtn.onclick = function (ev) {
+    ev.stopPropagation();
+    if (helpModal && !helpModal.hidden) closeHelpModal();
+    else openHelpModal();
+  };
+  if (menuHelpBtn) menuHelpBtn.onclick = function (ev) {
+    ev.stopPropagation();
+    openHelpModal();
+  };
+  if (helpClose) helpClose.onclick = function () {
+    closeHelpModal();
+  };
+  if (helpModal) helpModal.onclick = function (ev) {
+    if (ev.target === helpModal) {
+      closeHelpModal();
+    }
+  };
+  document.addEventListener('keydown', function (ev) {
+    if (ev.key === 'Escape' && helpModal && !helpModal.hidden) {
+      closeHelpModal();
+    }
+  });
+
+  // PWA beforeinstallprompt capture
+  var deferredInstallPrompt = null;
+  window.addEventListener('beforeinstallprompt', function (e) {
+    e.preventDefault();
+    deferredInstallPrompt = e;
+    if (helpPwaInstallBtn) {
+      helpPwaInstallBtn.style.display = 'inline-block';
+      helpPwaInstallBtn.onclick = function () {
+        if (deferredInstallPrompt) {
+          deferredInstallPrompt.prompt();
+          deferredInstallPrompt.userChoice.then(function () {
+            deferredInstallPrompt = null;
+            helpPwaInstallBtn.style.display = 'none';
+          });
+        }
+      };
     }
   });
 
