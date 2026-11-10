@@ -153,6 +153,54 @@ body {
 .layer-swatch-park { border-color: #2E7D32; border-style: dashed; background: rgba(129,199,132,0.35); }
 .layer-swatch-community { border-color: #6A1B9A; border-style: dashed; background: rgba(186,104,200,0.3); }
 .layer-swatch-pending { border-color: #455A64; border-style: dashed; background: rgba(144,164,174,0.3); }
+.layer-swatch-pack { border-color: #0f766e; border-style: solid; background: rgba(45,212,191,0.5); }
+
+/* Offline Map Packs in Layers dropdown */
+.layers-pack-section {
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 1px solid #e2ebd8;
+}
+.layers-pack-title {
+  font-size: 10.5px;
+  font-weight: 700;
+  color: #1f4a2c;
+  letter-spacing: 0.03em;
+  margin-bottom: 6px;
+}
+.layers-pack-buttons {
+  display: flex;
+  gap: 6px;
+}
+.pack-btn {
+  flex: 1;
+  font-size: 11px;
+  padding: 5px 6px;
+  background: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  border-radius: 4px;
+  color: #334155;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  font-weight: 600;
+  transition: background 0.15s, border-color 0.15s;
+}
+.pack-btn:hover {
+  background: #e2e8f0;
+  border-color: #94a3b8;
+}
+.pack-icon {
+  font-size: 12px;
+}
+.offline-cache-status {
+  font-size: 10.5px;
+  color: #64748b;
+  margin-top: 5px;
+  line-height: 1.3;
+}
 
 /* Hide default Leaflet layer control */
 .leaflet-control-layers {
@@ -238,6 +286,42 @@ body {
 }
 .tb-btn-clear:hover {
   background: #fdf2f0;
+}
+.tb-btn-gps.active {
+  background: #1d4ed8;
+  border-color: #1e40af;
+  color: #ffffff;
+}
+.tb-btn-gps.active .tb-icon,
+.tb-btn-gps.active .tb-label {
+  color: #ffffff;
+}
+
+/* Real-time GPS Location marker */
+.gps-pulse-marker {
+  width: 14px;
+  height: 14px;
+  background: #2563eb;
+  border: 2.5px solid #ffffff;
+  border-radius: 50%;
+  box-shadow: 0 0 6px rgba(37,99,235,0.6);
+  position: relative;
+}
+.gps-pulse-marker::after {
+  content: '';
+  position: absolute;
+  top: -6px;
+  left: -6px;
+  right: -6px;
+  bottom: -6px;
+  border-radius: 50%;
+  border: 2px solid #3b82f6;
+  opacity: 0.8;
+  animation: gps-ping 2s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+@keyframes gps-ping {
+  0% { transform: scale(0.8); opacity: 0.9; }
+  75%, 100% { transform: scale(2.2); opacity: 0; }
 }
 .tb-icon {
   font-size: 15px;

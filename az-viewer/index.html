@@ -4,9 +4,16 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Swindon green corridors - residents map (DRAFT)</title>
+<meta name="theme-color" content="#15803d">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="GreenCorridor">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icons/icon-180.png">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <link rel="stylesheet" href="https://unpkg.com/@geoman-io/leaflet-geoman-free@2.16.0/dist/leaflet-geoman.css">
-<link rel="stylesheet" href="style.css?v=29">
+<link rel="stylesheet" href="style.css?v=30">
 </head>
 <body>
 
@@ -37,6 +44,19 @@
   <div id="layers-list" class="layers-list">
     <!-- Populated dynamically in app.js -->
   </div>
+  <div class="layers-pack-section">
+    <div class="layers-pack-title">OFFLINE MAP PACKS</div>
+    <div class="layers-pack-buttons">
+      <button type="button" id="btn-cache-tiles" class="pack-btn" title="Download map tiles for current view to use offline">
+        <span class="pack-icon">&#128229;</span> Cache View
+      </button>
+      <button type="button" id="btn-import-pack" class="pack-btn" title="Load offline map pack file (.json/.geojson)">
+        <span class="pack-icon">&#128194;</span> Import Pack
+      </button>
+      <input type="file" id="file-import-pack" accept=".json,.geojson" style="display:none">
+    </div>
+    <div id="offline-cache-status" class="offline-cache-status">Offline storage ready</div>
+  </div>
 </div>
 
 <div id="layout" class="panel-hidden">
@@ -62,6 +82,10 @@
     <button type="button" id="tb-area-calc" class="tb-btn" title="Measure area (preview placeholder)">
       <span class="tb-icon">&#9699;</span>
       <span class="tb-label">Calc Area</span>
+    </button>
+    <button type="button" id="tb-gps-locate" class="tb-btn tb-btn-gps" title="Show my current GPS location">
+      <span class="tb-icon">&#9678;</span>
+      <span class="tb-label">GPS</span>
     </button>
     <button type="button" id="tb-clear" class="tb-btn tb-btn-clear" title="Clear current drawing">
       <span class="tb-icon">&#10005;</span>
@@ -186,6 +210,6 @@
 <script>window.COMMUNITY_SUBMIT_URL = 'https://twilight-violet-8787.danmillerarchaeology.workers.dev';</script>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://unpkg.com/@geoman-io/leaflet-geoman-free@2.16.0/dist/leaflet-geoman.min.js"></script>
-<script src="app.js?v=29"></script>
+<script src="app.js?v=30"></script>
 </body>
 </html>

@@ -1,0 +1,18 @@
+{
+  "name": "green-corridor-app",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Swindon Green Corridors Mobile and Web App",
+  "scripts": {
+    "pack:build": "python worker/build_map_pack.py",
+    "pack:gzip": "python worker/build_map_pack.py --gzip",
+    "cap:add:android": "npx @capacitor/cli add android",
+    "cap:sync": "npx @capacitor/cli sync",
+    "cap:open:android": "npx @capacitor/cli open android"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^6.0.0",
+    "@capacitor/core": "^6.0.0",
+    "@capacitor/android": "^6.0.0"
+  }
+}

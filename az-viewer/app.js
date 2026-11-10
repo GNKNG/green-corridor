@@ -351,6 +351,8 @@
       '<em>DRAFT / NOTHING FILED. Indicative only, not a legal boundary.</em>';
   }
 
+  var importedLayers = [];
+
   function buildLayersMenu() {
     if (!layersList) return;
     layersList.innerHTML = '';
@@ -368,6 +370,10 @@
       { layer: overlays['Community suggestions - indicative (approved)'], cls: 'layer-swatch-community', name: 'Community suggestions' },
       { layer: myPendingLayer, cls: 'layer-swatch-pending', name: 'My pending suggestions' }
     ];
+
+    importedLayers.forEach(function (imp) {
+      layerSpecs.push(imp);
+    });
 
     layerSpecs.forEach(function (spec) {
       if (!spec.layer) return;
@@ -393,6 +399,141 @@
       row.appendChild(lbl);
       layersList.appendChild(row);
     });
+  }
+
+  // Offline Map Pack & Tile Caching Controls
+  var btnCacheTiles = document.getElementById('btn-cache-tiles');
+  var btnImportPack = document.getElementById('btn-import-pack');
+  var fileImportPack = document.getElementById('file-import-pack');
+  var cacheStatusEl = document.getElementById('offline-cache-status');
+
+  function lon2tile(lon, zoom) {
+    return Math.floor((lon + 180) / 360 * Math.pow(2, zoom));
+  }
+  function lat2tile(lat, zoom) {
+    return Math.floor((1 - Math.log(Math.tan(lat * Math.PI / 180) + 1 / Math.cos(lat * Math.PI / 180)) / Math.PI) / 2 * Math.pow(2, zoom));
+  }
+
+  if (btnCacheTiles) {
+    btnCacheTiles.onclick = function () {
+      if (!('caches' in window)) {
+        showToast('Offline cache storage not supported on this browser.');
+        return;
+      }
+      var bounds = map.getBounds();
+      var currentZ = Math.round(map.getZoom());
+      var zooms = [currentZ, Math.min(18, currentZ + 1)];
+      var tileUrls = [];
+
+      zooms.forEach(function (z) {
+        var minX = lon2tile(bounds.getWest(), z);
+        var maxX = lon2tile(bounds.getEast(), z);
+        var minY = lat2tile(bounds.getNorth(), z);
+        var maxY = lat2tile(bounds.getSouth(), z);
+
+        for (var x = Math.min(minX, maxX); x <= Math.max(minX, maxX); x++) {
+          for (var y = Math.min(minY, maxY); y <= Math.max(minY, maxY); y++) {
+            tileUrls.push('https://tile.openstreetmap.org/' + z + '/' + x + '/' + y + '.png');
+          }
+        }
+      });
+
+      if (tileUrls.length > 150) {
+        tileUrls = tileUrls.slice(0, 150);
+      }
+
+      if (cacheStatusEl) cacheStatusEl.textContent = 'Caching ' + tileUrls.length + ' map tiles...';
+      showToast('Caching ' + tileUrls.length + ' map tiles for offline use...');
+
+      caches.open('gc-data-v2').then(function (cache) {
+        var completed = 0;
+        return Promise.all(tileUrls.map(function (url) {
+          return fetch(url).then(function (resp) {
+            if (resp && resp.ok) {
+              cache.put(url, resp);
+              completed += 1;
+              if (cacheStatusEl && completed % 10 === 0) {
+                cacheStatusEl.textContent = 'Cached ' + completed + '/' + tileUrls.length + ' tiles...';
+              }
+            }
+          }).catch(function () {});
+        })).then(function () {
+          if (cacheStatusEl) cacheStatusEl.textContent = 'Cached ' + completed + ' tiles. Ready offline!';
+          showToast('Success: ' + completed + ' tiles cached! Map works offline.');
+        });
+      }).catch(function (err) {
+        if (cacheStatusEl) cacheStatusEl.textContent = 'Cache error: ' + (err.message || 'failed');
+        showToast('Could not cache tiles: ' + (err.message || 'unknown error'));
+      });
+    };
+  }
+
+  if (btnImportPack && fileImportPack) {
+    btnImportPack.onclick = function () {
+      fileImportPack.click();
+    };
+
+    fileImportPack.onchange = function (ev) {
+      var file = ev.target.files && ev.target.files[0];
+      if (!file) return;
+      var reader = new FileReader();
+      reader.onload = function (e) {
+        try {
+          var data = JSON.parse(e.target.result);
+          var layersAdded = 0;
+
+          if (data.layers && Array.isArray(data.layers)) {
+            data.layers.forEach(function (packLayer) {
+              var fc = { type: 'FeatureCollection', features: packLayer.features || [] };
+              var lyr = L.geoJSON(fc, {
+                style: { color: '#0d9488', weight: 2, fillOpacity: 0.35, fillColor: '#14b8a6' },
+                pointToLayer: function (f, latlng) { return L.circleMarker(latlng, { radius: 6, color: '#0f766e', fillColor: '#2dd4bf', fillOpacity: 0.8 }); },
+                onEachFeature: function (f, l) {
+                  var p = f.properties || {};
+                  l.bindPopup('<strong>' + esc(p.name || packLayer.name || 'Offline Feature') + '</strong><br>' +
+                    'Pack: ' + esc(data.pack_name || 'Imported Pack') + '<br>' +
+                    (p.notes ? 'Notes: ' + esc(p.notes) + '<br>' : '') +
+                    '<em>Loaded from offline map pack.</em>');
+                }
+              }).addTo(map);
+
+              importedLayers.push({
+                name: (packLayer.name || 'Pack Layer') + ' (' + (packLayer.features ? packLayer.features.length : 0) + ')',
+                layer: lyr,
+                cls: 'layer-swatch-pack'
+              });
+              layersAdded += 1;
+            });
+            buildLayersMenu();
+            if (cacheStatusEl) cacheStatusEl.textContent = 'Loaded ' + layersAdded + ' layers from map pack';
+            showToast('Loaded ' + layersAdded + ' layers from ' + (data.pack_name || file.name) + '!');
+          } else if (data.type === 'FeatureCollection' || data.features) {
+            var lyrSingle = L.geoJSON(data, {
+              style: { color: '#7c3aed', weight: 2, fillOpacity: 0.35, fillColor: '#8b5cf6' },
+              pointToLayer: function (f, latlng) { return L.circleMarker(latlng, { radius: 6, color: '#6d28d9', fillColor: '#a78bfa', fillOpacity: 0.8 }); },
+              onEachFeature: function (f, l) {
+                var p = f.properties || {};
+                l.bindPopup('<strong>' + esc(p.name || file.name) + '</strong><br><em>Imported GeoJSON layer.</em>');
+              }
+            }).addTo(map);
+
+            importedLayers.push({
+              name: file.name.replace(/\.[^/.]+$/, '') + ' (' + (data.features ? data.features.length : 0) + ')',
+              layer: lyrSingle,
+              cls: 'layer-swatch-pack'
+            });
+            buildLayersMenu();
+            if (cacheStatusEl) cacheStatusEl.textContent = 'Loaded ' + file.name;
+            showToast('Loaded GeoJSON: ' + file.name);
+          } else {
+            showToast('Unrecognized format. Please select a GeoJSON or Green Corridor Map Pack.');
+          }
+        } catch (err) {
+          showToast('Failed to parse file: ' + err.message);
+        }
+      };
+      reader.readAsText(file);
+    };
   }
 
   function loadParcels() {
@@ -649,6 +790,7 @@
   var tbClear = document.getElementById('tb-clear');
   var tbMeasure = document.getElementById('tb-measure');
   var tbAreaCalc = document.getElementById('tb-area-calc');
+  var tbGpsLocate = document.getElementById('tb-gps-locate');
 
   var drawPrompt = document.getElementById('drawing-prompt');
   var drawPromptText = document.getElementById('drawing-prompt-text');
@@ -759,6 +901,166 @@
     showToast('Area calculation tool (preview placeholder) - coming in next release.');
   };
 
+  // Real-time GPS location tracking
+  var gpsWatchId = null;
+  var gpsMarker = null;
+  var gpsAccuracyCircle = null;
+  var gpsFirstFix = false;
+
+  function stopGpsTracking() {
+    if (gpsWatchId !== null && navigator.geolocation) {
+      try { navigator.geolocation.clearWatch(gpsWatchId); } catch (e) {}
+      gpsWatchId = null;
+    }
+    if (gpsMarker) {
+      try { map.removeLayer(gpsMarker); } catch (e) {}
+      gpsMarker = null;
+    }
+    if (gpsAccuracyCircle) {
+      try { map.removeLayer(gpsAccuracyCircle); } catch (e) {}
+      gpsAccuracyCircle = null;
+    }
+    if (tbGpsLocate) {
+      tbGpsLocate.classList.remove('active');
+    }
+    gpsFirstFix = false;
+  }
+
+  function startGpsTracking() {
+    if (!navigator.geolocation) {
+      showToast('Geolocation is not supported by your device or browser.');
+      return;
+    }
+    stopGpsTracking();
+    if (tbGpsLocate) tbGpsLocate.classList.add('active');
+    showToast('Acquiring GPS fix...');
+
+    var pulseIcon = L.divIcon({
+      className: 'gps-pulse-marker',
+      iconSize: [14, 14],
+      iconAnchor: [7, 7]
+    });
+
+    gpsWatchId = navigator.geolocation.watchPosition(
+      function (pos) {
+        if (!pos || !pos.coords) return;
+        var lat = pos.coords.latitude;
+        var lng = pos.coords.longitude;
+        var acc = pos.coords.accuracy || 0;
+        var latlng = [lat, lng];
+
+        if (!gpsMarker) {
+          gpsMarker = L.marker(latlng, { icon: pulseIcon, zIndexOffset: 1000 }).addTo(map);
+          gpsAccuracyCircle = L.circle(latlng, {
+            radius: acc,
+            color: '#2563eb',
+            fillColor: '#3b82f6',
+            fillOpacity: 0.15,
+            weight: 1.5,
+            interactive: false
+          }).addTo(map);
+          gpsMarker.bindPopup('You are here<br><span style="font-size:11px;color:#64748b;">Accuracy: ~' + Math.round(acc) + 'm</span>');
+        } else {
+          gpsMarker.setLatLng(latlng);
+          gpsAccuracyCircle.setLatLng(latlng);
+          gpsAccuracyCircle.setRadius(acc);
+          gpsMarker.setPopupContent('You are here<br><span style="font-size:11px;color:#64748b;">Accuracy: ~' + Math.round(acc) + 'm</span>');
+        }
+
+        if (!gpsFirstFix) {
+          gpsFirstFix = true;
+          map.setView(latlng, Math.max(map.getZoom(), 16), { animate: true });
+          showToast('GPS position locked (accuracy ~' + Math.round(acc) + 'm)');
+        }
+      },
+      function (err) {
+        var msg = 'Could not acquire GPS position.';
+        if (err && err.code === 1) msg = 'Location access permission denied.';
+        else if (err && err.code === 2) msg = 'GPS signal unavailable.';
+        else if (err && err.code === 3) msg = 'GPS timeout.';
+        showToast(msg);
+        stopGpsTracking();
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 20000,
+        maximumAge: 5000
+      }
+    );
+  }
+
+  if (tbGpsLocate) {
+    tbGpsLocate.onclick = function () {
+      if (gpsWatchId !== null) {
+        stopGpsTracking();
+        showToast('GPS tracking disabled.');
+      } else {
+        startGpsTracking();
+      }
+    };
+  }
+
+  // Offline Submission Queue
+  var OFFLINE_QUEUE_KEY = 'gc_offline_queue_v1';
+  function getOfflineQueue() {
+    try {
+      var raw = localStorage.getItem(OFFLINE_QUEUE_KEY);
+      return raw ? JSON.parse(raw) : [];
+    } catch (e) {
+      return [];
+    }
+  }
+  function saveOfflineQueue(items) {
+    try {
+      localStorage.setItem(OFFLINE_QUEUE_KEY, JSON.stringify(items));
+    } catch (e) {}
+  }
+  function enqueueOfflineSubmission(item) {
+    var q = getOfflineQueue();
+    q.push(item);
+    saveOfflineQueue(q);
+  }
+  var isFlushingQueue = false;
+  function flushOfflineQueue() {
+    if (isFlushingQueue || !navigator.onLine) return;
+    var q = getOfflineQueue();
+    if (!q || q.length === 0) return;
+    var endpoint = String(window.COMMUNITY_SUBMIT_URL || '').trim();
+    if (!endpoint) return;
+
+    isFlushingQueue = true;
+    var currentItem = q[0];
+    fetch(endpoint, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(currentItem.payload)
+    })
+      .then(function (r) { return r.json().catch(function () { return {}; }).then(function (d) { return { ok: r.ok, data: d }; }); })
+      .then(function (res) {
+        if (res.ok && res.data && res.data.ok) {
+          q.shift();
+          saveOfflineQueue(q);
+          showToast('Uploaded 1 offline survey return to server.');
+        }
+      })
+      .catch(function () {
+        // Will retry on next online event
+      })
+      .then(function () {
+        isFlushingQueue = false;
+        var remaining = getOfflineQueue();
+        if (remaining.length > 0 && navigator.onLine) {
+          setTimeout(flushOfflineQueue, 1500);
+        }
+      });
+  }
+
+  window.addEventListener('online', function () {
+    showToast('Device back online! Syncing cached survey returns...');
+    flushOfflineQueue();
+  });
+  setTimeout(flushOfflineQueue, 3500);
+
   // Species selector & badger protection notice toggling
   var speciesSelect = document.getElementById('c-species');
   var speciesNotice = document.getElementById('species-badger-notice');
@@ -829,6 +1131,34 @@
     var payload = { geometry: geom, attributes: attrs, website: asciiVal(document.getElementById('c-website').value) };
     var btn = document.getElementById('c-submit');
     if (btn) { btn.disabled = true; btn.textContent = 'Sending...'; }
+
+    // If currently offline, queue locally and notify immediately
+    if (!navigator.onLine) {
+      enqueueOfflineSubmission({ payload: payload, queued_at: new Date().toISOString() });
+      var pendingOffline = loadLocalPending();
+      pendingOffline.push({ geometry: geom, properties: attrs, submitted_at: new Date().toISOString(), offline_saved: true });
+      saveLocalPending(pendingOffline);
+      renderMyPending();
+      buildLayersMenu();
+      try { if (!map.hasLayer(myPendingLayer)) myPendingLayer.addTo(map); } catch (e) {}
+      setResult('Offline: saved locally on device. Will auto-upload when back online.', 'ok');
+      form.reset();
+      checkBadgerNotice();
+      clearDrawing();
+      if (isBadger) {
+        showToast('Saved on phone! Badger location protected; will auto-upload when online.');
+      } else {
+        showToast('Saved on phone! Will auto-upload when connected.');
+      }
+      setTimeout(function () {
+        layout.classList.add('panel-hidden');
+        updateToggleText();
+        setTimeout(function () { map.invalidateSize(); }, 50);
+      }, 1200);
+      if (btn) { btn.disabled = false; btn.textContent = 'Send return'; }
+      return;
+    }
+
     setResult('Sending return...');
     fetch(endpoint, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) })
       .then(function (r) { return r.json().catch(function(){ return {}; }).then(function(d){ return { ok: r.ok, data: d }; }); })
@@ -859,7 +1189,36 @@
           setResult(msg || 'Could not send right now.', 'err');
         }
       })
-      .catch(function () { setResult('Network error. Please try again.', 'err'); })
+      .catch(function () {
+        enqueueOfflineSubmission({ payload: payload, queued_at: new Date().toISOString() });
+        var pendingOfflineCatch = loadLocalPending();
+        pendingOfflineCatch.push({ geometry: geom, properties: attrs, submitted_at: new Date().toISOString(), offline_saved: true });
+        saveLocalPending(pendingOfflineCatch);
+        renderMyPending();
+        buildLayersMenu();
+        try { if (!map.hasLayer(myPendingLayer)) myPendingLayer.addTo(map); } catch (e) {}
+        setResult('Saved locally on device (network unreachable). Will auto-upload when reconnected.', 'ok');
+        form.reset();
+        checkBadgerNotice();
+        clearDrawing();
+        showToast('Network error: saved locally. Will auto-upload when connection returns.');
+        setTimeout(function () {
+          layout.classList.add('panel-hidden');
+          updateToggleText();
+          setTimeout(function () { map.invalidateSize(); }, 50);
+        }, 1200);
+      })
       .then(function () { if (btn) { btn.disabled = false; btn.textContent = 'Send return'; } });
   });
+
+  // Service Worker Registration for PWA / offline support
+  if ('serviceWorker' in navigator && window.location.protocol.indexOf('http') === 0) {
+    window.addEventListener('load', function () {
+      navigator.serviceWorker.register('./sw.js').then(function () {
+        // SW registered
+      }).catch(function () {
+        // SW registration failed
+      });
+    });
+  }
 })();
