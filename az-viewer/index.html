@@ -6,79 +6,164 @@
 <title>Swindon green corridors - residents map (DRAFT)</title>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <link rel="stylesheet" href="https://unpkg.com/@geoman-io/leaflet-geoman-free@2.16.0/dist/leaflet-geoman.css">
-<link rel="stylesheet" href="style.css?v=20">
+<link rel="stylesheet" href="style.css?v=26">
 </head>
 <body>
-<header id="banner">
-  <strong>DRAFT / NOTHING FILED.</strong>
-  Indicative only, not a legal boundary. Not a designation, survey, approval, ownership, or group claim.
-  Adopted EN1 = policy context; proposed/emerging areas are draft and indicative only.
-  <span id="banner-date">Data date: 2026-11-08</span>
+
+<!-- Minimal Thin Top Strip -->
+<header id="top-bar">
+  <div class="top-bar-left">
+    <span class="app-title">Swindon Green Corridors</span>
+    <span class="app-badge">DRAFT</span>
+  </div>
+  <div class="top-bar-right">
+    <button id="layers-toggle-btn" class="top-btn" aria-label="Toggle map layers">
+      <span class="top-btn-icon">&#9638;</span>
+      <span class="top-btn-label">Layers</span>
+    </button>
+    <button id="panel-toggle" class="top-btn" aria-label="Toggle menu">
+      <span class="top-btn-icon">&#9776;</span>
+      <span class="top-btn-label">Menu</span>
+    </button>
+  </div>
 </header>
-<div id="layout">
-  <button id="panel-toggle" aria-label="Hide panel">Hide panel</button>
+
+<!-- Floating Layers Dropdown Dialog -->
+<div id="layers-menu" class="layers-dropdown" hidden>
+  <div class="layers-dropdown-header">
+    <strong>Map Layers</strong>
+    <button id="layers-close-btn" class="layers-close-btn" aria-label="Close layers">&times;</button>
+  </div>
+  <div id="layers-list" class="layers-list">
+    <!-- Populated dynamically in app.js -->
+  </div>
+</div>
+
+<div id="layout" class="panel-hidden">
+
+  <!-- Map Screen Floating Drawing & Tools Toolbar -->
+  <div id="map-toolbar" class="map-toolbar" role="toolbar" aria-label="Map drawing tools">
+    <button type="button" id="tb-draw-area" class="tb-btn" title="Annotate area (polygon)">
+      <span class="tb-icon">&#9645;</span>
+      <span class="tb-label">Area</span>
+    </button>
+    <button type="button" id="tb-draw-finish" class="tb-btn tb-btn-finish" title="Finish drawing area" disabled>
+      <span class="tb-icon">&#10003;</span>
+      <span class="tb-label">Finish</span>
+    </button>
+    <button type="button" id="tb-draw-marker" class="tb-btn" title="Annotate marker (point/flag)">
+      <span class="tb-icon">&#9873;</span>
+      <span class="tb-label">Marker</span>
+    </button>
+    <button type="button" id="tb-measure" class="tb-btn" title="Measure distance (preview placeholder)">
+      <span class="tb-icon">&#128207;</span>
+      <span class="tb-label">Measure</span>
+    </button>
+    <button type="button" id="tb-area-calc" class="tb-btn" title="Measure area (preview placeholder)">
+      <span class="tb-icon">&#9699;</span>
+      <span class="tb-label">Calc Area</span>
+    </button>
+    <button type="button" id="tb-clear" class="tb-btn tb-btn-clear" title="Clear current drawing">
+      <span class="tb-icon">&#10005;</span>
+      <span class="tb-label">Clear</span>
+    </button>
+  </div>
+
+  <!-- Drawing Prompt Bar (active during drawing) -->
+  <div id="drawing-prompt" class="drawing-prompt" hidden>
+    <span id="drawing-prompt-text">Drawing area: double-tap to place point</span>
+    <button type="button" id="prompt-finish-btn" class="prompt-btn prompt-btn-finish">Finish</button>
+    <button type="button" id="prompt-cancel-btn" class="prompt-btn">Cancel</button>
+  </div>
+
+  <!-- Toast Notification Message -->
+  <div id="toast-msg" class="toast-msg" hidden aria-live="polite"></div>
+
+  <!-- Collapsible Side Panel (Menu View and Dedicated Data Entry View) -->
   <aside id="panel">
-    <h1>Swindon green corridors - residents map</h1>
-    <p class="sub">Draft borough overview (A-Z layers). Labels: EN1 = corridor number (XX), proposed = pN. Are groups or parishes already working on these areas?</p>
-    <label for="search">Find a Swindon street, postcode, place, or parcel label (map moves there):</label>
-    <input id="search" type="text" placeholder="e.g. SN2 7JF, a street name, 23, p12" autocomplete="off">
-    <ul id="results"></ul>
 
-    <h2>Add a green space (indicative)</h2>
-    <p class="sub">Draw an <strong>indicative</strong> area or marker on the map and tell us about it. Not a boundary, designation, survey, approval, or ownership claim. Submissions are reviewed before they appear. No email collected - to get in touch, use the <a href="https://gnkng.github.io/green-corridor/survey-swindon.html">contact/survey form</a>.</p>
-    <div class="draw-controls">
-      <button type="button" id="draw-area" class="btn">Draw area (polygon)</button>
-      <button type="button" id="draw-marker" class="btn">Add marker (point/flag)</button>
-      <button type="button" id="draw-finish" class="btn btn-muted">Finish area</button>
-      <button type="button" id="draw-clear" class="btn btn-muted">Clear drawing</button>
-      <button type="button" id="draw-help-btn" class="btn btn-muted">Help</button>
-      <button type="button" id="pending-clear" class="btn btn-muted">Clear my pending</button>
-    </div>
-    <div id="draw-help" class="sub draw-help" hidden>
-      <strong>How to draw (basic):</strong><br>
-      - <strong>Draw area (polygon):</strong> tap/click the map to add points around the area. To finish, double-click/tap the last point (or the first point), or use <strong>Finish area</strong>.<br>
-      - <strong>Add marker (point/flag):</strong> tap/click the map once to place a marker.<br>
-      - <strong>Clear drawing</strong> removes the current draft. <strong>Clear my pending</strong> removes your locally saved pending (P) markers on this device only. Drawings are indicative only.
-    </div>
-    <p id="draw-status" class="sub" aria-live="polite">No drawing yet.</p>
-    <form id="community-form" novalidate>
-      <label for="c-place">Place name (required, or give street name)</label>
-      <input id="c-place" name="place" type="text" maxlength="120" autocomplete="off">
-      <label for="c-street">Street name (alternative to place, no house numbers)</label>
-      <input id="c-street" name="street" type="text" maxlength="120" autocomplete="off" placeholder="e.g. Queens Drive area">
-      <label for="c-type">Broad type</label>
-      <select id="c-type" name="broad_type">
-        <option value="">Select (optional)</option>
-        <option value="green_corridor">Green corridor / link</option>
-        <option value="park_open_space">Park / open space</option>
-        <option value="woodland">Woodland / trees</option>
-        <option value="grassland">Grassland / verge</option>
-        <option value="water">Water / pond / stream</option>
-        <option value="allotment_garden">Allotment / community garden</option>
-        <option value="other">Other</option>
-      </select>
-      <label for="c-notes">Comments (optional, free text)</label>
-      <textarea id="c-notes" name="notes" maxlength="800" rows="3"></textarea>
-      <label for="c-contact">Contact (optional)</label>
-      <input id="c-contact" name="contact" type="text" maxlength="200" autocomplete="off">
-      <p class="sub">Privacy: do not put personal contact details (email/phone) here. To get in touch, use the <a href="https://gnkng.github.io/green-corridor/survey-swindon.html">contact/survey form</a>.</p>
-      <input id="c-website" name="website" type="text" tabindex="-1" autocomplete="off" class="hp" aria-hidden="true">
-      <button type="submit" id="c-submit" class="btn btn-primary">Send for review</button>
-    </form>
-    <p id="c-result" class="sub" aria-live="polite"></p>
+    <!-- VIEW 1: SEARCH & PARCELS (MENU) -->
+    <div id="view-menu" class="panel-view">
+      <div class="panel-header">
+        <h1>Swindon green corridors</h1>
+        <p class="sub">Residents map overview (A-Z layers). Labels: EN1 = corridor number (XX), proposed = pN.</p>
+      </div>
 
-    <h2>Parcels/features (<span id="count">0</span>)</h2>
-    <ul id="parcel-list"></ul>
-    <h2>About</h2>
-    <p>Layers (toggle on map): adopted EN1 green corridors (policy context), proposed new areas (DRAFT / indicative, emerging context), amenity water (indicative, includes OSM/Overpass-derived features where shown; (c) OpenStreetMap contributors, ODbL), and approved community suggestions (indicative, reviewed). The emerging Local Plan/proposed map is not adopted. Not seeing a place here does not by itself settle its status.</p>
-    <p>Contact: <a href="https://gnkng.github.io/green-corridor/survey-swindon.html">survey/contact form</a>. Full map: <a href="https://gnkng.github.io/green-corridor/az-viewer/">az-viewer</a>. Facebook: <a href="https://www.facebook.com/swindon.green.spaces">Swindon green spaces</a>.</p>
-    <p><a href="https://consultations.swindon.gov.uk/publication-stage-swindon-local-plan-2043">Council Reg 19 hub (formal route only)</a></p>
+      <!-- Legal Disclaimer Card -->
+      <div class="disclaimer-card">
+        <strong>DRAFT / NOTHING FILED.</strong>
+        <p>Indicative only, not a legal boundary. Not a designation, survey, approval, ownership, or group claim. Adopted EN1 = policy context; proposed/emerging areas are draft and indicative only.</p>
+        <div class="disclaimer-date">Data date: 2026-11-08</div>
+      </div>
+
+      <!-- Search Section -->
+      <div class="panel-card">
+        <label for="search">Find a Swindon street, postcode, place, or parcel label:</label>
+        <input id="search" type="text" placeholder="e.g. SN2 7JF, Queens Drive, 23, p12, Lydiard" autocomplete="off">
+        <ul id="results"></ul>
+      </div>
+
+      <!-- Parcels Section -->
+      <div class="panel-card">
+        <h2>Parcels/features <span class="count-badge"><span id="count">0</span></span></h2>
+        <ul id="parcel-list"></ul>
+      </div>
+    </div>
+
+    <!-- VIEW 2: DEDICATED DATA ENTRY PAGE (ANNOTATE MAP) -->
+    <div id="view-entry" class="panel-view" hidden>
+      <div class="panel-header">
+        <div class="flex-between">
+          <h1>Annotate map</h1>
+          <button type="button" id="entry-close-btn" class="btn btn-muted btn-sm">Back to map</button>
+        </div>
+        <p class="sub">Tell us about the area or marker you just added on the map. Indicative only, not a legal claim.</p>
+      </div>
+
+      <div class="panel-card">
+        <p id="draw-status" class="sub" aria-live="polite">Drawing captured.</p>
+        <form id="community-form" novalidate>
+          <label for="c-place">Location / place name (required, or give street name)</label>
+          <input id="c-place" name="place" type="text" maxlength="120" autocomplete="off" placeholder="e.g. Coate Water East Verge">
+
+          <label for="c-street">Street name (alternative to place, no house numbers)</label>
+          <input id="c-street" name="street" type="text" maxlength="120" autocomplete="off" placeholder="e.g. Queens Drive area">
+
+          <label for="c-type">Broad type</label>
+          <select id="c-type" name="broad_type">
+            <option value="">Select (optional)</option>
+            <option value="green_corridor">Green corridor / link</option>
+            <option value="park_open_space">Park / open space</option>
+            <option value="woodland">Woodland / trees</option>
+            <option value="grassland">Grassland / verge</option>
+            <option value="water">Water / pond / stream</option>
+            <option value="allotment_garden">Allotment / community garden</option>
+            <option value="other">Other</option>
+          </select>
+
+          <label for="c-notes">Comments (optional, free text)</label>
+          <textarea id="c-notes" name="notes" maxlength="800" rows="3" placeholder="Notes about this green space..."></textarea>
+
+          <label for="c-contact">Contact (optional)</label>
+          <input id="c-contact" name="contact" type="text" maxlength="200" autocomplete="off" placeholder="Name or organisation">
+
+          <p class="sub">Privacy: do not include sensitive personal details or precise wildlife nest/sett locations.</p>
+          <input id="c-website" name="website" type="text" tabindex="-1" autocomplete="off" class="hp" aria-hidden="true">
+
+          <button type="submit" id="c-submit" class="btn btn-primary">Send return</button>
+          <button type="button" id="entry-cancel-btn" class="btn btn-muted" style="width: 100%; margin-top: 6px;">Cancel & return to map</button>
+        </form>
+        <p id="c-result" class="sub" aria-live="polite"></p>
+      </div>
+    </div>
+
   </aside>
   <div id="map"></div>
 </div>
+
 <script>window.COMMUNITY_SUBMIT_URL = 'https://twilight-violet-8787.danmillerarchaeology.workers.dev';</script>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://unpkg.com/@geoman-io/leaflet-geoman-free@2.16.0/dist/leaflet-geoman.min.js"></script>
-<script src="app.js?v=20"></script>
+<script src="app.js?v=26"></script>
 </body>
 </html>
