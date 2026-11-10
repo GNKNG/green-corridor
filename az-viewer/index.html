@@ -6,7 +6,7 @@
 <title>Swindon green corridors - residents map (DRAFT)</title>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <link rel="stylesheet" href="https://unpkg.com/@geoman-io/leaflet-geoman-free@2.16.0/dist/leaflet-geoman.css">
-<link rel="stylesheet" href="style.css?v=27">
+<link rel="stylesheet" href="style.css?v=28">
 </head>
 <body>
 
@@ -154,8 +154,11 @@
             <option value="flora">Flora / wildflowers / veteran trees</option>
             <option value="unclassified">Unclassified / other (held for review)</option>
           </select>
+          <p class="species-statutory-note" style="font-size: 11px; color: #64748b; margin: 3px 0 8px 0; line-height: 1.35;">
+            Records of protected species should be submitted to the Council. Any submitted here are generalised or held for review &mdash; it is an offence to make public the location of a badger sett.
+          </p>
           <div id="species-badger-notice" class="species-notice" style="display:none; font-size:11.5px; color:#92400e; background:#fef3c7; border:1px solid #fde68a; padding:7px 10px; border-radius:6px; margin:4px 0 10px 0; line-height:1.35;">
-            <strong>Protection Notice:</strong> Badger presence records are automatically generalised to a 500m grid square per the <em>Protection of Badgers Act 1992</em>. Exact sett locations or pinpoint coordinates are never captured, stored, or published.
+            <strong>Protection Notice:</strong> Records of protected species should be submitted to the Council. Any submitted here are automatically generalised to a 500m grid square per the <em>Protection of Badgers Act 1992</em> &mdash; it is an offence to make public the location of a badger sett. Exact coordinates are never stored or published.
           </div>
 
           <label for="c-notes">Comments (optional, free text)</label>
@@ -164,7 +167,9 @@
           <label for="c-contact">Contact (optional)</label>
           <input id="c-contact" name="contact" type="text" maxlength="200" autocomplete="off" placeholder="Name or organisation">
 
-          <p class="sub">Privacy: do not include sensitive personal details or precise wildlife nest/sett locations.</p>
+          <p class="sub" style="font-size: 11px; color: #64748b; margin: 8px 0 12px 0; line-height: 1.35;">
+            <strong>Privacy &amp; Wildlife Notice:</strong> Records of protected species should be submitted to the Council. Any submitted here are generalised or held for review &mdash; it is an offence to make public the location of a badger sett. Please do not include house numbers or precise sett/nest locations.
+          </p>
           <input id="c-website" name="website" type="text" tabindex="-1" autocomplete="off" class="hp" aria-hidden="true">
 
           <button type="submit" id="c-submit" class="btn btn-primary">Send return</button>
@@ -181,6 +186,6 @@
 <script>window.COMMUNITY_SUBMIT_URL = 'https://twilight-violet-8787.danmillerarchaeology.workers.dev';</script>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://unpkg.com/@geoman-io/leaflet-geoman-free@2.16.0/dist/leaflet-geoman.min.js"></script>
-<script src="app.js?v=27"></script>
+<script src="app.js?v=28"></script>
 </body>
 </html>
