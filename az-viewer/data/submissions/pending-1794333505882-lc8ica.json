@@ -1,0 +1,22 @@
+{
+  "type": "Feature",
+  "geometry": {
+    "type": "Point",
+    "coordinates": [
+      -1.828351,
+      51.548676
+    ]
+  },
+  "properties": {
+    "feature_class": "community_suggestion",
+    "status": "pending_review",
+    "submitted_at": "2026-11-10T17:58:25Z",
+    "geometry_kind": "marker",
+    "place": "Toothill Park",
+    "street_area": "",
+    "broad_type": "water",
+    "notes": "Rewilding area around pond and maintaining it.",
+    "contact_provided": true,
+    "ip_hash": "866467df54aa2de9"
+  }
+}
