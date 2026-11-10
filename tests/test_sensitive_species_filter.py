@@ -109,29 +109,30 @@ def test_promote_pending_badger_polygon_promoted_safely():
         pending_file = td / "pending_badger_poly.json"
         community_file = td / "community.geojson"
 
-        # Generalised 500m grid cell polygon
+        # Generalised Council HQ polygon
         poly_geom = {
             "type": "Polygon",
             "coordinates": [[
-                [-1.788, 51.560],
-                [-1.780, 51.560],
-                [-1.780, 51.565],
-                [-1.788, 51.565],
-                [-1.788, 51.560],
+                [-1.7798, 51.5593],
+                [-1.7761, 51.5593],
+                [-1.7761, 51.5609],
+                [-1.7798, 51.5609],
+                [-1.7798, 51.5593],
             ]],
         }
         pending_data = {
             "type": "Feature",
             "geometry": poly_geom,
             "properties": {
-                "place": "Coate Woods",
+                "place": "Swindon Borough Council Civic Offices",
+                "street_area": "Euclid Street, Swindon SN1 2JH",
                 "species": "badger",
                 "sensitive_species": True,
                 "generalised": True,
-                "generalisation_grid": "500m",
+                "generalisation_mode": "council_hq_swindon",
                 "notes": "Badger presence observed",
                 "ip_hash": "a1b2c3d4e5f6",
-                "audit_log": [{"action": "generalise_500m_grid"}],
+                "audit_log": [{"action": "snap_to_council_hq"}],
             },
         }
         community_data = {"type": "FeatureCollection", "features": []}
@@ -144,7 +145,7 @@ def test_promote_pending_badger_polygon_promoted_safely():
             capture_output=True,
             text=True,
         )
-        assert res.returncode == 0, f"Promotion of valid 500m badger record failed: {res.stderr}"
+        assert res.returncode == 0, f"Promotion of valid Council HQ badger record failed: {res.stderr}"
 
         comm = json.loads(community_file.read_text(encoding="utf-8"))
         assert len(comm["features"]) == 1
@@ -153,6 +154,8 @@ def test_promote_pending_badger_polygon_promoted_safely():
         assert feat["properties"]["species"] == "badger"
         assert feat["properties"]["status"] == "approved"
         assert feat["properties"]["generalised"] is True
+        assert feat["properties"]["generalisation_mode"] == "council_hq_swindon"
+        assert feat["properties"]["place"] == "Swindon Borough Council Civic Offices"
         # Verify internal PII and audit history are stripped from public GeoJSON
         assert "ip_hash" not in feat["properties"]
         assert "audit_log" not in feat["properties"]

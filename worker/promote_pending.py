@@ -82,15 +82,18 @@ def main(argv: list[str]) -> int:
             print(
                 "FATAL: Badger record has Point geometry! Pinpoint coordinates violate the\n"
                 "Protection of Badgers Act 1992 and Natural England guidelines.\n"
-                "Refusing to publish precise badger location. Geometry must be a 500m grid Polygon.",
+                "Refusing to publish precise badger location. Geometry must be snapped to Council HQ Polygon.",
                 file=sys.stderr
             )
             return 1
         props["species"] = "badger"
         props["sensitive_species"] = True
         props["generalised"] = True
-        props["generalisation_grid"] = "500m"
+        props["generalisation_mode"] = "council_hq_swindon"
+        props["generalisation_location"] = "Swindon Borough Council Civic Offices, Euclid Street, SN1 2JH"
         props["privacy_protection"] = "Protection of Badgers Act 1992"
+        props["place"] = "Swindon Borough Council Civic Offices"
+        props["street_area"] = "Euclid Street, Swindon SN1 2JH"
 
     for k in list(props.keys()):
         if k in DROP_PUBLIC:

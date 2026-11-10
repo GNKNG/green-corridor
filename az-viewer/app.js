@@ -269,7 +269,7 @@
     var rows = [];
     if (p.species && p.species !== 'none') rows.push('Wildlife focus: ' + esc(p.species));
     if (p.sensitive_species === 'badger' || p.generalised) {
-      rows.push('<span style="color:#b45309;font-weight:600;">[Generalised 500m Grid Area - Badger presence recorded]</span>');
+      rows.push('<span style="color:#b45309;font-weight:600;">[Generalised to Borough Council HQ - Badger presence recorded]</span>');
     }
     if (p.place) rows.push('Location: ' + esc(p.place));
     if (p.street_area || p.street) rows.push('Street: ' + esc(p.street_area || p.street));
@@ -279,13 +279,13 @@
     return '<strong>' + esc(lab) + '</strong> <span style="color:#666">(community)</span><br>' +
       'Type: ' + esc(CLASS_META.community_suggestion.label) + '<br>' +
       (rows.length ? rows.join('<br>') + '<br>' : '') +
-      '<em>Community indicative sketch - not a legal boundary or designation claim. Exact sett coordinates withheld per Protection of Badgers Act 1992.</em>';
+      '<em>Community indicative sketch - not a legal boundary or designation claim. All badger records are snapped to Swindon Borough Council Civic Offices per Protection of Badgers Act 1992.</em>';
   }
   function myPendingPopupHtml(p, lab) {
     var rows = [];
     if (p.species && p.species !== 'none') rows.push('Wildlife focus: ' + esc(p.species));
     if (p.sensitive_species === 'badger' || p.generalised) {
-      rows.push('<span style="color:#b45309;font-weight:600;">[Generalised 500m Grid Area - Badger presence recorded]</span>');
+      rows.push('<span style="color:#b45309;font-weight:600;">[Generalised to Borough Council HQ - Badger presence recorded]</span>');
     }
     if (p.place) rows.push('Location: ' + esc(p.place));
     if (p.street_area || p.street) rows.push('Street: ' + esc(p.street_area || p.street));
@@ -295,7 +295,7 @@
     return '<strong>' + esc(lab) + '</strong> <span style="color:#666">(pending)</span><br>' +
       'Type: ' + esc(CLASS_META.my_pending.label) + '<br>' +
       (rows.length ? rows.join('<br>') + '<br>' : '') +
-      '<em>Queued for review - only visible on this device until approved. Indicative only. Exact sett coordinates withheld per Protection of Badgers Act 1992.</em>';
+      '<em>Queued for review - only visible on this device until approved. Indicative only. All badger records are snapped to Swindon Borough Council Civic Offices per Protection of Badgers Act 1992.</em>';
   }
 
   function popupHtml(p, lab) {
@@ -620,38 +620,19 @@
   function hasSensitiveClient(text) {
     return SENSITIVE_TERMS_RE.test(String(text || ''));
   }
-  function generaliseTo500mGridClient(geom) {
-    if (!geom) return null;
-    var lon = 0, lat = 0;
-    if (geom.type === 'Point' && geom.coordinates) {
-      lon = geom.coordinates[0];
-      lat = geom.coordinates[1];
-    } else if (geom.type === 'Polygon' && geom.coordinates && geom.coordinates[0] && geom.coordinates[0].length > 0) {
-      var pts = geom.coordinates[0];
-      var sx = 0, sy = 0;
-      for (var i = 0; i < pts.length; i++) { sx += pts[i][0]; sy += pts[i][1]; }
-      lon = sx / pts.length;
-      lat = sy / pts.length;
-    } else {
-      return geom;
-    }
-    var lonStep = 0.008; // ~554m at 51.5 deg N
-    var latStep = 0.005; // ~556m
-    var minLon = Math.floor(lon / lonStep) * lonStep;
-    var minLat = Math.floor(lat / latStep) * latStep;
-    var maxLon = minLon + lonStep;
-    var maxLat = minLat + latStep;
-    function r(n) { return Math.round(n * 1000000) / 1000000; }
-    return {
-      type: 'Polygon',
-      coordinates: [[
-        [r(minLon), r(minLat)],
-        [r(maxLon), r(minLat)],
-        [r(maxLon), r(maxLat)],
-        [r(minLon), r(maxLat)],
-        [r(minLon), r(minLat)]
-      ]]
-    };
+  // Swindon Borough Council Civic Offices, Euclid Street, SN1 2JH (51.56011 N, -1.77796 W)
+  var COUNCIL_HQ_POLYGON = {
+    type: 'Polygon',
+    coordinates: [[
+      [-1.7798, 51.5593],
+      [-1.7761, 51.5593],
+      [-1.7761, 51.5609],
+      [-1.7798, 51.5609],
+      [-1.7798, 51.5593]
+    ]]
+  };
+  function snapToCouncilHqClient(geom) {
+    return COUNCIL_HQ_POLYGON;
   }
   function sanitizeBadgerTextClient(text) {
     var s = String(text || '');
@@ -825,15 +806,16 @@
     };
 
     if (isBadger) {
-      geom = generaliseTo500mGridClient(geom);
+      geom = snapToCouncilHqClient(geom);
       attrs.species = 'badger';
       attrs.sensitive_species = true;
       attrs.generalised = true;
-      attrs.generalisation_grid = '500m';
+      attrs.generalisation_mode = 'council_hq_swindon';
+      attrs.generalisation_location = 'Swindon Borough Council Civic Offices, Euclid Street, SN1 2JH';
       attrs.privacy_protection = 'Protection of Badgers Act 1992';
+      attrs.place = 'Swindon Borough Council Civic Offices';
+      attrs.street = 'Euclid Street, Swindon SN1 2JH';
       attrs.notes = sanitizeBadgerTextClient(notesVal);
-      attrs.place = sanitizeBadgerTextClient(place);
-      attrs.street = sanitizeBadgerTextClient(street);
     } else if (speciesVal === 'unclassified') {
       attrs.hold_reason = 'unclassified_species_default_held';
       attrs.status = 'pending_review';
@@ -864,7 +846,7 @@
           checkBadgerNotice();
           clearDrawing();
           if (isBadger) {
-            showToast('Return submitted! Badger presence generalised to 500m grid per 1992 Act.');
+            showToast('Return submitted! Badger presence snapped to Swindon Borough Council HQ per 1992 Act.');
           } else {
             showToast('Return submitted! Queued for review.');
           }

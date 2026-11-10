@@ -6,9 +6,11 @@ import assert from 'node:assert';
 import {
   isBadgerRecord,
   hasSensitive,
-  generaliseTo500mGrid,
+  snapToCouncilHq,
   sanitizeBadgerText,
-  stripHouseNumber
+  stripHouseNumber,
+  COUNCIL_HQ_POLYGON,
+  handleSubmission
 } from '../worker/worker-safe.js';
 
 console.log('Testing sensitive species filter in worker-safe.js...');
@@ -33,38 +35,22 @@ assert.strictEqual(hasSensitive('fox den near bank'), true, 'den is sensitive');
 assert.strictEqual(hasSensitive('nice walking route'), false, 'walking route is not sensitive');
 console.log('  PASS: hasSensitive shelter detection tests');
 
-// 3. generaliseTo500mGrid tests
+// 3. snapToCouncilHq tests (Swindon Borough Council Civic Offices, Euclid St)
 var rawPoint = { type: 'Point', coordinates: [-1.785432, 51.562341] };
-var genPoly = generaliseTo500mGrid(rawPoint);
-assert.strictEqual(genPoly.type, 'Polygon', 'Must be converted to a Polygon');
-assert.strictEqual(Array.isArray(genPoly.coordinates), true, 'Must have coordinates array');
-assert.strictEqual(genPoly.coordinates[0].length, 5, 'Must be a closed 5-vertex ring');
+var hqPoly = snapToCouncilHq(rawPoint);
+assert.strictEqual(hqPoly.type, 'Polygon', 'Must be converted to a Polygon');
+assert.strictEqual(Array.isArray(hqPoly.coordinates), true, 'Must have coordinates array');
+assert.strictEqual(hqPoly.coordinates[0].length, 5, 'Must be a closed 5-vertex ring');
 
-// Verify 500m grid resolution (~0.008 lon, ~0.005 lat)
-var ring = genPoly.coordinates[0];
-var minLon = ring[0][0], minLat = ring[0][1];
-var maxLon = ring[2][0], maxLat = ring[2][1];
-assert.ok(Math.abs((maxLon - minLon) - 0.008) < 0.0001, 'Longitude step must be 0.008 deg (~554m)');
-assert.ok(Math.abs((maxLat - minLat) - 0.005) < 0.0001, 'Latitude step must be 0.005 deg (~556m)');
-
-// Verify that the original pinpoint is safely contained within the 500m cell
-assert.ok(rawPoint.coordinates[0] >= minLon && rawPoint.coordinates[0] <= maxLon, 'Raw lon inside grid cell');
-assert.ok(rawPoint.coordinates[1] >= minLat && rawPoint.coordinates[1] <= maxLat, 'Raw lat inside grid cell');
-
-// Verify polygon input generalisation
-var rawPoly = {
-  type: 'Polygon',
-  coordinates: [[
-    [-1.785, 51.560],
-    [-1.784, 51.560],
-    [-1.784, 51.561],
-    [-1.785, 51.561],
-    [-1.785, 51.560]
-  ]]
-};
-var genPoly2 = generaliseTo500mGrid(rawPoly);
-assert.strictEqual(genPoly2.type, 'Polygon', 'Polygon input must also snap to 500m grid');
-console.log('  PASS: generaliseTo500mGrid math tests');
+// Verify coordinates encompass Civic Offices (-1.77796, 51.56011)
+var ring = hqPoly.coordinates[0];
+var minLon = Math.min(...ring.map(p => p[0]));
+var maxLon = Math.max(...ring.map(p => p[0]));
+var minLat = Math.min(...ring.map(p => p[1]));
+var maxLat = Math.max(...ring.map(p => p[1]));
+assert.ok(minLon <= -1.77796 && -1.77796 <= maxLon, 'Council HQ lon must be inside polygon bounds');
+assert.ok(minLat <= 51.56011 && 51.56011 <= maxLat, 'Council HQ lat must be inside polygon bounds');
+console.log('  PASS: snapToCouncilHq geometry tests');
 
 // 4. sanitizeBadgerText tests
 assert.strictEqual(
@@ -90,8 +76,6 @@ assert.strictEqual(
 console.log('  PASS: sanitizeBadgerText redaction tests');
 
 // 5. handleSubmission end-to-end integration tests (with mock GitHub fetch)
-import { handleSubmission } from '../worker/worker-safe.js';
-
 var capturedPuts = [];
 var originalFetch = globalThis.fetch;
 
@@ -122,10 +106,10 @@ var mockEnv = {
   GITHUB_BRANCH: 'main'
 };
 
-// Test A: Badger tag + precise pin -> snaps to 500m polygon, pin never stored
+// Test A: Badger tag + precise pin -> snapped to Swindon Borough Council Civic Offices
 capturedPuts = [];
 var resA = await handleSubmission({
-  geometry: { type: 'Point', coordinates: [-1.785, 51.560] },
+  geometry: { type: 'Point', coordinates: [-1.820, 51.580] },
   attributes: {
     place: 'Coate Water',
     street: 'Marlborough Road',
@@ -137,20 +121,22 @@ var resA = await handleSubmission({
 assert.strictEqual(resA.status, 200, 'Submission A should succeed');
 assert.strictEqual(capturedPuts.length, 1, 'Should have created 1 file');
 var recA = capturedPuts[0].record;
-assert.strictEqual(recA.geometry.type, 'Polygon', 'Badger pin must be converted to Polygon');
-assert.strictEqual(recA.geometry.coordinates[0].length, 5, 'Must be 500m grid polygon');
+assert.strictEqual(recA.geometry.type, 'Polygon', 'Badger pin must be converted to Council HQ Polygon');
+assert.strictEqual(recA.geometry.coordinates[0].length, 5, 'Must be closed polygon');
 assert.strictEqual(recA.properties.species, 'badger', 'Species must be badger');
 assert.strictEqual(recA.properties.sensitive_species, true, 'sensitive_species must be true');
 assert.strictEqual(recA.properties.generalised, true, 'generalised must be true');
-assert.strictEqual(recA.properties.generalisation_grid, '500m', 'grid must be 500m');
+assert.strictEqual(recA.properties.generalisation_mode, 'council_hq_swindon', 'mode must be council_hq_swindon');
+assert.strictEqual(recA.properties.place, 'Swindon Borough Council Civic Offices', 'place must be snapped to Council Offices');
+assert.strictEqual(recA.properties.street_area, 'Euclid Street, Swindon SN1 2JH', 'street must be Euclid Street');
 assert.strictEqual(recA.properties.privacy_protection, 'Protection of Badgers Act 1992', 'protection law must be recorded');
-assert.strictEqual(recA.properties.audit_log[0].action, 'generalise_500m_grid', 'audit log action must match');
-console.log('  PASS: Test A - Badger tag + precise pin generalised to 500m grid polygon');
+assert.strictEqual(recA.properties.audit_log[0].action, 'snap_to_council_hq', 'audit log action must match');
+console.log('  PASS: Test A - Badger tag + pin snapped to Swindon Borough Council Civic Offices');
 
-// Test B: Badger mentioned in free text without species tag -> detected, generalised
+// Test B: Badger mentioned in free text without species tag -> detected, snapped to Council HQ
 capturedPuts = [];
 var resB = await handleSubmission({
-  geometry: { type: 'Point', coordinates: [-1.785, 51.560] },
+  geometry: { type: 'Point', coordinates: [-1.750, 51.540] },
   attributes: {
     place: 'Field Boundary',
     street: 'Croft Road',
@@ -161,37 +147,18 @@ var resB = await handleSubmission({
 
 assert.strictEqual(resB.status, 200, 'Submission B should succeed');
 var recB = capturedPuts[0].record;
-assert.strictEqual(recB.geometry.type, 'Polygon', 'Badger in text must trigger Polygon generalisation');
+assert.strictEqual(recB.geometry.type, 'Polygon', 'Badger in text must snap to Council HQ Polygon');
 assert.strictEqual(recB.properties.species, 'badger', 'Detected badger species');
+assert.strictEqual(recB.properties.place, 'Swindon Borough Council Civic Offices', 'place snapped to Council HQ');
 assert.strictEqual(recB.properties.notes.includes('badger sett'), false, 'badger sett must be sanitized');
 assert.strictEqual(recB.properties.notes.includes('badger presence'), true, 'sanitized to badger presence');
 assert.strictEqual(recB.properties.generalised, true, 'generalised flag set');
-assert.strictEqual(recB.properties.audit_log[0].action, 'generalise_500m_grid', 'audit log records generalisation');
-console.log('  PASS: Test B - Badger free text detected and generalised');
+assert.strictEqual(recB.properties.audit_log[0].action, 'snap_to_council_hq', 'audit log records snap_to_council_hq');
+console.log('  PASS: Test B - Badger free text detected and snapped to Council HQ');
 
-// Test C: Explicit sett at residential number -> geometry withheld completely
+// Test C: Unclassified species -> default to held for review
 capturedPuts = [];
 var resC = await handleSubmission({
-  geometry: { type: 'Point', coordinates: [-1.785, 51.560] },
-  attributes: {
-    place: 'Garden',
-    street: 'sett at number 42 High Street',
-    species: 'badger',
-    notes: 'sett located in garden of number 42'
-  }
-}, '127.0.0.1', mockEnv);
-
-assert.strictEqual(resC.status, 200, 'Submission C should succeed');
-var recC = capturedPuts[0].record;
-assert.strictEqual(recC.geometry, null, 'Explicit residential sett location geometry must be withheld');
-assert.strictEqual(recC.properties.status, 'withheld_sensitive', 'Status must be withheld_sensitive');
-assert.strictEqual(recC.properties.hold_reason, 'explicit_sett_location_withheld', 'Hold reason must be recorded');
-assert.strictEqual(recC.properties.audit_log[0].action, 'withhold_geometry', 'Audit log must record withhold_geometry');
-console.log('  PASS: Test C - Explicit sett location at house number withheld');
-
-// Test D: Unclassified species -> default to held for review
-capturedPuts = [];
-var resD = await handleSubmission({
   geometry: { type: 'Point', coordinates: [-1.785, 51.560] },
   attributes: {
     place: 'Town Gardens',
@@ -201,15 +168,15 @@ var resD = await handleSubmission({
   }
 }, '127.0.0.1', mockEnv);
 
-assert.strictEqual(resD.status, 200, 'Submission D should succeed');
-var recD = capturedPuts[0].record;
-assert.strictEqual(recD.properties.species, 'unclassified', 'Unclassified species tag');
-assert.strictEqual(recD.properties.status, 'pending_review', 'Unclassified status defaults to pending_review');
-assert.strictEqual(recD.properties.hold_reason, 'unclassified_species_default_held', 'Hold reason set');
-assert.strictEqual(recD.properties.audit_log[0].action, 'hold_for_review', 'Audit log records hold_for_review');
-console.log('  PASS: Test D - Unclassified record defaults to held');
+assert.strictEqual(resC.status, 200, 'Submission C should succeed');
+var recC = capturedPuts[0].record;
+assert.strictEqual(recC.properties.species, 'unclassified', 'Unclassified species tag');
+assert.strictEqual(recC.properties.status, 'pending_review', 'Unclassified status defaults to pending_review');
+assert.strictEqual(recC.properties.hold_reason, 'unclassified_species_default_held', 'Hold reason set');
+assert.strictEqual(recC.properties.audit_log[0].action, 'hold_for_review', 'Audit log records hold_for_review');
+console.log('  PASS: Test C - Unclassified record defaults to held');
 
 // Restore original fetch
 globalThis.fetch = originalFetch;
 
-console.log('ALL WORKER INTEGRATION & GENERALISATION TESTS PASSED SUCCESSFULLY.');
+console.log('ALL WORKER INTEGRATION & COUNCIL HQ SNAPPING TESTS PASSED SUCCESSFULLY.');
