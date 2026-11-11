@@ -113,4 +113,15 @@ Under all deployment options (Web, PWA, APK):
 - Covers local Wiltshire/Swindon wildlife rescues (Oak & Furrows `01793 640136`, Wiltshire Wildlife Hospital `07850 778752`), statutory protection (Badgers Act 1992, Wildlife & Countryside Act 1981), feeding guidelines (hedgehogs, birds, badgers), pond escape ramps, and pollinator planting.
 - Supports live keyword filtering, category tabs, direct mobile calling (`tel:` links), and hash deep-linking (`#library=hedgehogs`).
 
+---
+
+## 7. Pending Planning Applications Layer (v=34)
+
+- **Harvest Script:** `worker/fetch_planning_swindon.py` pulls recent (120d) pending/undecided applications for Swindon from PlanIt UK (`planit.org.uk`, OGL) into `az-viewer/data/planning-swindon.geojson` and bundles it into `swindon_greens_pack.json.gz`.
+- **Hidden by Default:** Layer starts unchecked in the **Layers** menu so corridors remain uncluttered.
+- **Colour-Coded Categories:** Large/Major (red), Medium (orange), Trees/Hedgerow (purple), Standard Full/Outline (magenta), Conditions/Amendments (slate grey).
+- **Direct Portal & Annotation Links:** Popups show reference ID, proposal text, target decision date, Swindon Public Access links (Portal Summary, Documents, Comment), and **Add corridor note here** to pre-populate a field survey return next to the site.
+- **Snapshot Recency Notice:** Exact harvest date (`harvested_date`) is displayed inside the Layers drawer, sidebar disclaimer card, annotation panel, and every application popup.
+
+
 

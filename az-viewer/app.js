@@ -423,8 +423,17 @@
     registered_park_garden: { label: 'Registered Park & Garden (heritage designation)', color: '#2E7D32', fill: '#81C784', weight: 2, dash: '4 4', fillOpacity: 0.22, hatch: null, defaultVisible: false, swatch: 'layer-swatch-park' },
     ancient_woodland: { label: 'Ancient Woodland (Natural England Inventory)', color: '#166534', fill: '#22c55e', weight: 2.5, dash: '5 3', fillOpacity: 0.28, hatch: null, defaultVisible: false, swatch: 'layer-swatch-ancientwoodland' },
     public_right_of_way: { label: 'Public Rights of Way (Footpaths & Bridleways)', color: '#d97706', fill: null, weight: 2.4, dash: '4 4', fillOpacity: 0, hatch: null, defaultVisible: false, swatch: 'layer-swatch-prow' },
+    planning_application: { label: 'Planning Application (Pending / Undecided)', color: '#831843', fill: '#db2777', weight: 2, dash: null, fillOpacity: 0.85, hatch: null, defaultVisible: false, swatch: 'layer-swatch-planning' },
     community_suggestion: { label: 'Community suggestion (indicative, reviewed)', color: '#6A1B9A', fill: '#BA68C8', weight: 2, dash: '4 4', fillOpacity: 0.18, hatch: null, defaultVisible: false, swatch: 'layer-swatch-community' },
     my_pending: { label: 'My pending suggestion (local, awaiting review)', color: '#455A64', fill: '#90A4AE', weight: 2, dash: '6 4', fillOpacity: 0.2, hatch: null, defaultVisible: true, swatch: 'layer-swatch-pending' }
+  };
+
+  var PLANNING_STYLE_MAP = {
+    major:      { label: 'Major / Large', color: '#7f1d1d', fill: '#dc2626', radius: 9, badgeBg: '#fee2e2', badgeFg: '#991b1b' },
+    medium:     { label: 'Medium', color: '#7c2d12', fill: '#ea580c', radius: 7.5, badgeBg: '#ffedd5', badgeFg: '#9a3412' },
+    trees:      { label: 'Trees / Hedgerow', color: '#4c1d95', fill: '#7c3aed', radius: 6.5, badgeBg: '#ede9fe', badgeFg: '#5b21b6' },
+    conditions: { label: 'Conditions / Amend', color: '#334155', fill: '#64748b', radius: 5, badgeBg: '#f1f5f9', badgeFg: '#475569' },
+    standard:   { label: 'Standard Pending', color: '#831843', fill: '#db2777', radius: 6, badgeBg: '#fce7f3', badgeFg: '#9d174d' }
   };
 
   function injectHatchDefs() {
@@ -461,6 +470,8 @@
   }
 
   var parcels = [];
+  var planningFeats = [];
+  var planningMeta = null;
   var groups = {};
   var foundMarker = null;
   var overlays = {};
@@ -554,9 +565,44 @@
       '</div>';
   }
 
+  function planningPopupHtml(p, lab, latlng) {
+    var st = PLANNING_STYLE_MAP[p.category] || PLANNING_STYLE_MAP.standard;
+    var badge = '<span class="plan-popup-badge" style="background:' + esc(st.badgeBg) + ';color:' + esc(st.badgeFg) + ';">Pending &bull; ' + esc(st.label) + '</span><br>';
+    var header = '<strong>' + esc(p.uid || lab) + '</strong>' +
+      (p.application_type ? ' <span style="color:#475569;font-size:11px;">(' + esc(p.application_type) + ')</span>' : '') + '<br>';
+    var locParts = [];
+    if (p.address) locParts.push('<strong>Site:</strong> ' + esc(p.address));
+    if (p.ward_name) locParts.push('<strong>Ward:</strong> ' + esc(p.ward_name));
+    if (p.parish) locParts.push('<strong>Parish:</strong> ' + esc(p.parish));
+    var locHtml = locParts.length ? locParts.join('<br>') + '<br>' : '';
+    var descHtml = p.description ? '<div class="plan-desc-box">' + esc(p.description) + '</div>' : '';
+    var dateParts = [];
+    if (p.start_date) dateParts.push('Received: ' + esc(p.start_date));
+    if (p.target_decision_date) dateParts.push('Target decision: ' + esc(p.target_decision_date));
+    var dateHtml = dateParts.length ? '<div style="font-size:11px;color:#475569;margin-bottom:4px;">' + dateParts.join(' &bull; ') + '</div>' : '';
+
+    var links = [];
+    if (p.url) links.push('<a class="plan-portal-btn" href="' + esc(safeExtUrl(p.url)) + '" target="_blank" rel="noopener noreferrer">Swindon Portal</a>');
+    if (p.docs_url) links.push('<a class="plan-portal-btn" href="' + esc(safeExtUrl(p.docs_url)) + '" target="_blank" rel="noopener noreferrer">Documents</a>');
+    if (p.comment_url) links.push('<a class="plan-portal-btn" href="' + esc(safeExtUrl(p.comment_url)) + '" target="_blank" rel="noopener noreferrer">Comment</a>');
+    var linksHtml = links.length ? '<div class="plan-portal-links">' + links.join('') + '</div>' : '';
+
+    var latVal = latlng ? latlng.lat : '';
+    var lngVal = latlng ? latlng.lng : '';
+    var noteBtn = (latlng != null)
+      ? '<button type="button" class="plan-annotate-btn" data-plan-uid="' + esc(p.uid || '') + '" data-plan-lat="' + esc(latVal) + '" data-plan-lng="' + esc(lngVal) + '" data-plan-ward="' + esc(p.ward_name || p.parish || '') + '">Add corridor note here</button>'
+      : '';
+
+    var hDate = p.harvested_date || (planningMeta && planningMeta.harvested_date) || 'unknown';
+    var recency = '<div class="plan-recency-note">Cached snapshot harvested ' + esc(hDate) + ' (via PlanIt). Verify live dates &amp; status on pa.swindon.gov.uk.</div>';
+
+    return badge + header + locHtml + descHtml + dateHtml + linksHtml + noteBtn + recency + shareButtonHtml('plan:' + (p.uid || lab), p.uid || lab);
+  }
+
   function popupHtml(p, lab) {
     if (p.feature_class === 'my_pending') return myPendingPopupHtml(p, lab);
     if (p.feature_class === 'community_suggestion') return communityPopupHtml(p, lab);
+    if (p.feature_class === 'planning_application') return planningPopupHtml(p, lab, null);
     var meta = CLASS_META[p.feature_class] || { label: p.feature_class || '' };
     var content = '';
 
@@ -635,6 +681,7 @@
       { layer: groups.registered_park_garden, cls: 'layer-swatch-park', name: 'Registered Parks & Gardens (' + (groups.registered_park_garden ? groups.registered_park_garden.getLayers().length : 0) + ')' },
       { layer: groups.ancient_woodland, cls: 'layer-swatch-ancientwoodland', name: 'Ancient Woodland (' + (groups.ancient_woodland ? groups.ancient_woodland.getLayers().length : 0) + ')' },
       { layer: groups.public_right_of_way, cls: 'layer-swatch-prow', name: 'Public Rights of Way (' + (groups.public_right_of_way ? groups.public_right_of_way.getLayers().length : 0) + ')' },
+      { layer: groups.planning_applications, cls: 'layer-swatch-planning', name: 'Planning Apps - Pending (' + (groups.planning_applications ? groups.planning_applications.getLayers().length : 0) + ')' },
       { layer: overlays['Community suggestions - indicative (approved)'], cls: 'layer-swatch-community', name: 'Community suggestions' },
       { layer: myPendingLayer, cls: 'layer-swatch-pending', name: 'My pending suggestions' }
     ];
@@ -667,6 +714,24 @@
       row.appendChild(lbl);
       layersList.appendChild(row);
     });
+
+    var harvestEl = document.getElementById('layers-harvest-info');
+    if (harvestEl) {
+      if (planningMeta && planningMeta.harvested_date) {
+        harvestEl.hidden = false;
+        harvestEl.innerHTML = '<strong>Planning Layer Snapshot:</strong> harvested <strong>' + esc(planningMeta.harvested_date) + '</strong> (' +
+          esc(planningMeta.window_days || 120) + 'd pending only; off by default). Verify live status on pa.swindon.gov.uk.' +
+          '<div class="plan-key-row">' +
+          '<span class="plan-key-item"><span class="plan-key-dot" style="background:#dc2626"></span>Large</span>' +
+          '<span class="plan-key-item"><span class="plan-key-dot" style="background:#ea580c"></span>Medium</span>' +
+          '<span class="plan-key-item"><span class="plan-key-dot" style="background:#7c3aed"></span>Trees</span>' +
+          '<span class="plan-key-item"><span class="plan-key-dot" style="background:#db2777"></span>Standard</span>' +
+          '<span class="plan-key-item"><span class="plan-key-dot" style="background:#64748b"></span>Cond.</span>' +
+          '</div>';
+      } else {
+        harvestEl.hidden = true;
+      }
+    }
   }
 
   // Offline Map Pack & Tile Caching Controls
@@ -713,7 +778,7 @@
       if (cacheStatusEl) cacheStatusEl.textContent = 'Caching ' + tileUrls.length + ' map tiles...';
       showToast('Caching ' + tileUrls.length + ' map tiles for offline use...');
 
-      caches.open('gc-data-v2').then(function (cache) {
+      caches.open('gc-data-v4').then(function (cache) {
         var completed = 0;
         return Promise.all(tileUrls.map(function (url) {
           return fetch(url).then(function (resp) {
@@ -962,6 +1027,50 @@
     });
   }
 
+  function loadPlanningApplications() {
+    return fetch('data/planning-swindon.geojson').then(function (r) { if (!r.ok) throw new Error('no'); return r.json(); }).then(function (fc) {
+      planningFeats = (fc && fc.features) ? fc.features : [];
+      planningMeta = (fc && fc.metadata) ? fc.metadata : { harvested_date: 'unknown', window_days: 120 };
+
+      var menuDatesEl = document.getElementById('menu-data-dates');
+      if (menuDatesEl && planningMeta.harvested_date) {
+        menuDatesEl.textContent = 'Corridors data: 2026-11-08 \u2022 Planning snapshot: ' + planningMeta.harvested_date +
+          ' (pending only, off by default). Verify live deadlines on pa.swindon.gov.uk.';
+      }
+      var entryRecencyEl = document.getElementById('entry-recency-note');
+      if (entryRecencyEl && planningMeta.harvested_date) {
+        entryRecencyEl.textContent = 'Planning layer snapshot harvested ' + planningMeta.harvested_date +
+          ' (off by default in Layers); always verify live application status and deadlines on Swindon Public Access.';
+      }
+
+      var layer = L.geoJSON({type: 'FeatureCollection', features: planningFeats}, {
+        pointToLayer: function (f, latlng) {
+          var p = (f && f.properties) || {};
+          var st = PLANNING_STYLE_MAP[p.category] || PLANNING_STYLE_MAP.standard;
+          return L.circleMarker(latlng, {
+            radius: st.radius,
+            color: st.color,
+            fillColor: st.fill,
+            fillOpacity: 0.88,
+            weight: (p.category === 'major') ? 2.5 : 1.8
+          });
+        },
+        onEachFeature: function (f, l) {
+          var p = f.properties || {};
+          var lab = p.uid || 'Planning App';
+          var latlng = l.getLatLng ? l.getLatLng() : null;
+          l.bindPopup(planningPopupHtml(p, lab, latlng));
+          l.on('click', function (ev) { try { L.DomEvent.stopPropagation(ev); } catch(e){} showSelectedLabel(l, lab, 'planning_application'); });
+        }
+      });
+      groups.planning_applications = layer;
+      overlays['Planning Apps - Pending (' + planningFeats.length + ')'] = layer;
+      // Intentionally NOT added to map by default (user toggles on in Layers)
+    }).catch(function () {
+      groups.planning_applications = L.layerGroup();
+    });
+  }
+
   function copyTextToClipboard(text) {
     if (navigator.clipboard && navigator.clipboard.writeText) {
       navigator.clipboard.writeText(text).catch(function () {});
@@ -980,6 +1089,23 @@
   function navigateToParcel(targetId) {
     if (!targetId) return;
     var lower = targetId.toLowerCase().trim();
+    if (lower.indexOf('plan:') === 0 && groups.planning_applications) {
+      var planUid = lower.slice(5);
+      if (!map.hasLayer(groups.planning_applications)) {
+        map.addLayer(groups.planning_applications);
+        buildLayersMenu();
+      }
+      groups.planning_applications.eachLayer(function (l) {
+        var lp = (l.feature && l.feature.properties) || {};
+        if (String(lp.uid || '').toLowerCase() === planUid || String(lp.id || '').toLowerCase() === lower) {
+          var ll = l.getLatLng();
+          map.setView(ll, 16, { animate: true });
+          showToast('Planning: ' + (lp.uid || planUid));
+          setTimeout(function () { l.openPopup(); }, 350);
+        }
+      });
+      return;
+    }
     var found = null;
     for (var i = 0; i < parcels.length; i++) {
       var p = parcels[i].properties || {};
@@ -1039,37 +1165,61 @@
 
   window.addEventListener('hashchange', handleUrlHash);
 
-  // Popup share button listener
+  // Popup share & annotate button listeners
   map.on('popupopen', function (e) {
     var el = e.popup && e.popup.getElement();
     if (!el) return;
-    var btn = el.querySelector('.popup-share-btn');
-    if (!btn) return;
-    btn.onclick = function (ev) {
-      ev.stopPropagation();
-      var shareId = btn.getAttribute('data-share-id') || '';
-      var shareTitle = btn.getAttribute('data-share-title') || 'Swindon Green Corridor';
-      var url = window.location.origin + window.location.pathname + '#parcel=' + encodeURIComponent(shareId);
-      if (history.replaceState) {
-        history.replaceState(null, null, '#parcel=' + encodeURIComponent(shareId));
-      }
-      if (navigator.share) {
-        navigator.share({
-          title: 'Swindon Green Corridor - ' + shareTitle,
-          text: 'View this green space on the community map:',
-          url: url
-        }).catch(function () {});
-      } else {
-        copyTextToClipboard(url);
-        showToast('Link copied to clipboard!');
-      }
-    };
+    var shareBtn = el.querySelector('.popup-share-btn');
+    if (shareBtn) {
+      shareBtn.onclick = function (ev) {
+        ev.stopPropagation();
+        var shareId = shareBtn.getAttribute('data-share-id') || '';
+        var shareTitle = shareBtn.getAttribute('data-share-title') || 'Swindon Green Corridor';
+        var url = window.location.origin + window.location.pathname + '#parcel=' + encodeURIComponent(shareId);
+        if (history.replaceState) {
+          history.replaceState(null, null, '#parcel=' + encodeURIComponent(shareId));
+        }
+        if (navigator.share) {
+          navigator.share({
+            title: 'Swindon Green Corridor - ' + shareTitle,
+            text: 'View this feature on the Swindon Green Corridor map:',
+            url: url
+          }).catch(function () {});
+        } else {
+          copyTextToClipboard(url);
+          showToast('Link copied to clipboard!');
+        }
+      };
+    }
+    var planNoteBtn = el.querySelector('.plan-annotate-btn');
+    if (planNoteBtn) {
+      planNoteBtn.onclick = function (ev) {
+        ev.stopPropagation();
+        var uid = planNoteBtn.getAttribute('data-plan-uid') || '';
+        var lat = parseFloat(planNoteBtn.getAttribute('data-plan-lat'));
+        var lng = parseFloat(planNoteBtn.getAttribute('data-plan-lng'));
+        var ward = planNoteBtn.getAttribute('data-plan-ward') || '';
+        if (!isNaN(lat) && !isNaN(lng)) {
+          try { map.closePopup(); } catch (err) {}
+          captureDraw(L.marker([lat, lng]));
+          var cPlace = document.getElementById('c-place');
+          var cNotes = document.getElementById('c-notes');
+          if (cPlace) {
+            cPlace.value = 'Near planning ref ' + uid + (ward ? ' (' + ward + ')' : '');
+          }
+          if (cNotes && !cNotes.value.trim()) {
+            cNotes.value = 'Ref planning application ' + uid + ': ';
+          }
+        }
+      };
+    }
   });
 
   loadParcels()
     .then(function () { return loadCommunity(); })
     .then(function () { return loadAncientWoodland(); })
     .then(function () { return loadProw(); })
+    .then(function () { return loadPlanningApplications(); })
     .catch(function () {})
     .then(function () {
       renderMyPending();
@@ -1120,6 +1270,19 @@
             markFound(b.getCenter(), 'Parcel ' + lab);
             closePanelOnMobile();
           } catch(e){}
+        }, 'parcel-hit');
+      });
+    }
+    if (planningFeats && planningFeats.length) {
+      planningFeats.filter(function (f) {
+        var p = f.properties || {};
+        return (String(p.uid||'') + ' ' + String(p.address||'') + ' ' + String(p.description||'') + ' ' + String(p.postcode||'')).toLowerCase().indexOf(ql) !== -1;
+      }).slice(0, 4).forEach(function (f) {
+        var p = f.properties || {};
+        var shortDesc = String(p.address || p.description || '').slice(0, 42);
+        addLine('Pending Plan: ' + p.uid + (shortDesc ? ' - ' + shortDesc : ''), function () {
+          navigateToParcel('plan:' + p.uid);
+          closePanelOnMobile();
         }, 'parcel-hit');
       });
     }

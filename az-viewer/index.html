@@ -13,7 +13,7 @@
 <link rel="apple-touch-icon" href="icons/icon-180.png">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <link rel="stylesheet" href="https://unpkg.com/@geoman-io/leaflet-geoman-free@2.16.0/dist/leaflet-geoman.css">
-<link rel="stylesheet" href="style.css?v=33">
+<link rel="stylesheet" href="style.css?v=34">
 </head>
 <body>
 
@@ -139,6 +139,7 @@
   <div id="layers-list" class="layers-list">
     <!-- Populated dynamically in app.js -->
   </div>
+  <div id="layers-harvest-info" class="layers-harvest-info" hidden></div>
   <div class="layers-pack-section">
     <div class="layers-pack-title">OFFLINE MAP PACKS</div>
     <div class="layers-pack-buttons">
@@ -212,7 +213,7 @@
       <div class="disclaimer-card">
         <strong>DRAFT / NOTHING FILED.</strong>
         <p>Indicative only, not a legal boundary. Not a designation, survey, approval, ownership, or group claim. Adopted EN1 = policy context; proposed/emerging areas are draft and indicative only.</p>
-        <div class="disclaimer-date">Data date: 2026-11-08</div>
+        <div class="disclaimer-date" id="menu-data-dates">Corridors data: 2026-11-08 &bull; Planning snapshot (off by default): cached weekly, verify live status on Swindon Public Access.</div>
       </div>
 
       <!-- App & Surveyor Quick Guide Card -->
@@ -318,8 +319,11 @@
             <div id="photo-scrub-badge" class="photo-scrub-badge">&#10003; Photo ready &mdash; EXIF location metadata scrubbed</div>
           </div>
 
-          <p class="sub" style="font-size: 11px; color: #64748b; margin: 8px 0 12px 0; line-height: 1.35;">
+          <p class="sub" style="font-size: 11px; color: #64748b; margin: 8px 0 8px 0; line-height: 1.35;">
             <strong>Privacy &amp; Wildlife Notice:</strong> Records of protected species should be submitted to the Council. Any badger records submitted here are snapped to Swindon Borough Council Civic Offices &mdash; it is an offence to make public the location of a badger sett. Please do not include house numbers or precise sett/nest locations.
+          </p>
+          <p id="entry-recency-note" class="sub" style="font-size: 10.5px; color: #64748b; margin: 0 0 12px 0; line-height: 1.35;">
+            Planning applications layer (off by default in Layers) uses a periodic cached snapshot; always verify live status and statutory comment deadlines on Swindon Public Access.
           </p>
           <input id="c-website" name="website" type="text" tabindex="-1" autocomplete="off" class="hp" aria-hidden="true">
 
@@ -337,6 +341,6 @@
 <script>window.COMMUNITY_SUBMIT_URL = 'https://twilight-violet-8787.danmillerarchaeology.workers.dev';</script>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://unpkg.com/@geoman-io/leaflet-geoman-free@2.16.0/dist/leaflet-geoman.min.js"></script>
-<script src="app.js?v=33"></script>
+<script src="app.js?v=34"></script>
 </body>
 </html>
