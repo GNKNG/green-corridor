@@ -1,25 +1,43 @@
 {
   "schema_version": "1.0",
-  "export_date": "2026-11-09",
+  "export_date": "2026-11-12",
   "config": "publish_config.yaml",
   "source": {
     "kind": "sqlite",
-    "path": "../map-data/baseline-v1-reg19.geojson.sqlite"
+    "path": "../map-data/baseline-v1-reg19.geojson.sqlite",
+    "supplemental_paths": [
+      "data/heritage-public.geojson"
+    ]
   },
   "counts": {
-    "source_features": 1104,
-    "exported": 900,
-    "denied": 204,
+    "source_features": 11941,
+    "exported": 2429,
+    "denied": 9746,
     "dropped_no_geometry": 0,
     "by_feature_class": {
-      "proposed_new_areas": 165,
+      "amenity_cemetery": 1,
+      "amenity_allotments": 6,
+      "proposed_green_network_additions_2026": 249,
+      "strategic_railway": 1,
       "en1_green_corridor": 40,
-      "amenity_water": 695
+      "high_value_habitat": 4,
+      "open_space_large": 5,
+      "country_park_core": 6,
+      "allotments_community_growing": 1,
+      "extra_urban_woodland": 63,
+      "amenity_water": 695,
+      "amenity_open_green": 1,
+      "osm_auto_green_draft": 1123,
+      "scheduled_monument": 72,
+      "registered_park_garden": 4,
+      "listed_building": 77,
+      "conservation_area": 27,
+      "unscheduled_archaeology": 54
     }
   },
   "output": "parcels-public.geojson",
-  "output_bytes": 852399,
-  "sha256": "62e9bf7c78e9d08cc32e46335cf740ae53136a0a73b90782416c88f8f6aedb34",
+  "output_bytes": 3007505,
+  "sha256": "78365ef74335f3336898eb1a028d006cd458304575616b57d241577689059c6a",
   "banners": {
     "draft": "DRAFT / NOTHING FILED",
     "indicative": "Indicative only - not a legal boundary.",

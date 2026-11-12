@@ -465,10 +465,15 @@ body {
   color: #22301f;
 }
 .layer-swatch-en1 { border-color: #1B7F3A; border-style: dashed; }
-.layer-swatch-proposed { border-color: #C77700; border-style: solid; }
+.layer-swatch-proposed { border-color: #C77700; border-style: solid; background: rgba(249,168,37,0.28); }
+.layer-swatch-proposed-auto { border-color: #D97706; border-style: dashed; background: rgba(245,158,11,0.24); }
 .layer-swatch-water { background: #42A5F5; border-color: #1565C0; }
+.layer-swatch-rail { border-color: #1E293B; border-style: dashed; background: transparent; }
 .layer-swatch-countrypark { border-color: #1B5E20; border-style: solid; background: rgba(76,175,80,0.45); }
 .layer-swatch-recreation { border-color: #2E7D32; border-style: solid; background: rgba(129,199,132,0.4); }
+.layer-swatch-highhabitat { border-color: #047857; border-style: solid; background: rgba(16,185,129,0.38); }
+.layer-swatch-woodland { border-color: #15803D; border-style: solid; background: rgba(74,222,128,0.38); }
+.layer-swatch-amenities { border-color: #65A30D; border-style: solid; background: rgba(163,230,53,0.42); }
 .layer-swatch-monument { border-color: #6A1B9A; border-style: dashed; background: rgba(186,104,200,0.35); }
 .layer-swatch-archaeology { border-color: #B7410E; border-style: dashed; background: rgba(224,122,95,0.38); }
 .layer-swatch-conservation { border-color: #8D6E63; border-style: dashed; background: rgba(215,204,200,0.5); }
@@ -1027,8 +1032,18 @@ body {
   white-space: nowrap;
 }
 .feat-label.feat-en1_green_corridor { border-color: #1B7F3A; }
+.feat-label.feat-proposed_green_network_additions_2026 { border-color: #C77700; }
+.feat-label.feat-osm_auto_green_draft { border-color: #D97706; }
 .feat-label.feat-proposed_new_areas { border-color: #C77700; }
 .feat-label.feat-amenity_water { border-color: #1565C0; font-size: 10px; font-weight: 600; }
+.feat-label.feat-strategic_railway { border-color: #1E293B; color: #0F172A; }
+.feat-label.feat-open_space_large { border-color: #2E7D32; color: #1B5E20; }
+.feat-label.feat-high_value_habitat { border-color: #047857; color: #065F46; }
+.feat-label.feat-extra_urban_woodland { border-color: #15803D; color: #14532D; }
+.feat-label.feat-amenity_allotments,
+.feat-label.feat-allotments_community_growing,
+.feat-label.feat-amenity_cemetery,
+.feat-label.feat-amenity_open_green { border-color: #65A30D; color: #3F6212; }
 .feat-label.feat-scheduled_monument { border-color: #6A1B9A; color: #4A148C; font-size: 11px; }
 .feat-label.feat-registered_park_garden { border-color: #2E7D32; color: #1B5E20; font-size: 11px; }
 .feat-label.feat-community_suggestion { border-color: #6A1B9A; color: #4A148C; }

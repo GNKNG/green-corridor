@@ -373,7 +373,10 @@
     var seq = {}, n = 0;
     (features || []).forEach(function (f) {
       var p = f.properties || {};
-      if (p.feature_class === 'proposed_new_areas') { n += 1; if (p.id != null) seq[String(p.id)] = n; }
+      if (p.feature_class === 'proposed_green_network_additions_2026' || p.feature_class === 'proposed_new_areas') {
+        n += 1;
+        if (p.id != null) seq[String(p.id)] = n;
+      }
     });
     return seq;
   }
@@ -388,11 +391,14 @@
       if (communityIndex != null) return 'C' + communityIndex;
       return 'C?';
     }
-    if (fc === 'proposed_new_areas') {
+    if (fc === 'proposed_green_network_additions_2026' || fc === 'proposed_new_areas') {
       for (i=0;i<official.length;i++){ v=nonempty(p[official[i]]); if(v) return v; }
       var pn = proposedSeq && proposedSeq[String(p.id)];
       if (pn != null) return 'p' + pn;
       for (i=0;i<generic.length;i++){ v=nonempty(p[generic[i]]); if(v) return v; }
+    }
+    if (fc === 'osm_auto_green_draft' || fc === 'strategic_railway' || fc === 'high_value_habitat' || fc === 'extra_urban_woodland' || fc === 'amenity_allotments' || fc === 'allotments_community_growing' || fc === 'amenity_cemetery' || fc === 'amenity_open_green') {
+      return nonempty(p.name) || nonempty(p.short_label) || nonempty(p.ref) || String(p.id || '');
     }
     if (fc === 'en1_green_corridor') {
       v = nonempty(p.map_label) || nonempty(p.short_ref); if (v) return v;
@@ -402,7 +408,7 @@
       for (i=0;i<generic.length;i++){ v=nonempty(p[generic[i]]); if(v && String(v).indexOf('osm-waterway')!==0) return v; }
       return 'Water';
     }
-    if (fc === 'scheduled_monument' || fc === 'registered_park_garden' || fc === 'listed_building' || fc === 'conservation_area' || fc === 'unscheduled_archaeology' || fc === 'country_park_core' || fc === 'recreation_ground') {
+    if (fc === 'scheduled_monument' || fc === 'registered_park_garden' || fc === 'listed_building' || fc === 'conservation_area' || fc === 'unscheduled_archaeology' || fc === 'country_park_core' || fc === 'open_space_large' || fc === 'recreation_ground') {
       return nonempty(p.name) || nonempty(p.short_label) || nonempty(p.ref) || String(p.id || '');
     }
     for (i=0;i<official.length;i++){ v=nonempty(p[official[i]]); if(v) return v; }
@@ -412,10 +418,21 @@
 
   var CLASS_META = {
     en1_green_corridor: { label: 'Adopted EN1 green corridor (policy context)', color: '#1B7F3A', fill: '#27AE60', weight: 3, dash: '8 5', fillOpacity: 0, hatch: 'hatch-en1', defaultVisible: true, swatch: 'layer-swatch-en1' },
+    proposed_green_network_additions_2026: { label: 'Proposed addition 2026 (DRAFT / indicative)', color: '#C77700', fill: '#F9A825', weight: 3, dash: null, fillOpacity: 0, hatch: 'hatch-proposed', defaultVisible: true, swatch: 'layer-swatch-proposed' },
+    osm_auto_green_draft: { label: 'Proposed auto-draft green area (DRAFT / indicative)', color: '#D97706', fill: '#F59E0B', weight: 2.2, dash: '4 3', fillOpacity: 0, hatch: 'hatch-proposed', defaultVisible: true, swatch: 'layer-swatch-proposed-auto' },
     proposed_new_areas: { label: 'Proposed new area (DRAFT / indicative)', color: '#C77700', fill: '#F9A825', weight: 3, dash: null, fillOpacity: 0, hatch: 'hatch-proposed', defaultVisible: true, swatch: 'layer-swatch-proposed' },
-    amenity_water:      { label: 'Amenity water (indicative)', color: '#1565C0', fill: '#42A5F5', weight: 2, dash: null, fillOpacity: 0.28, hatch: null, defaultVisible: true, swatch: 'layer-swatch-water' },
+    amenity_water:      { label: 'Rivers, canals & amenity water (indicative)', color: '#1565C0', fill: '#42A5F5', weight: 2, dash: null, fillOpacity: 0.28, hatch: null, defaultVisible: true, swatch: 'layer-swatch-water' },
+    strategic_railway:  { label: 'Strategic railway corridor (GWML)', color: '#1E293B', fill: '#334155', weight: 3.2, dash: '8 4', fillOpacity: 0, hatch: null, defaultVisible: true, swatch: 'layer-swatch-rail' },
     country_park_core:  { label: 'Country Park & Nature Reserve', color: '#1B5E20', fill: '#4CAF50', weight: 2.2, dash: null, fillOpacity: 0.25, hatch: null, defaultVisible: false, swatch: 'layer-swatch-countrypark' },
+    open_space_large:   { label: 'Large Open Space & Recreation Ground', color: '#2E7D32', fill: '#81C784', weight: 2, dash: null, fillOpacity: 0.22, hatch: null, defaultVisible: false, swatch: 'layer-swatch-recreation' },
     recreation_ground:  { label: 'Recreation Ground & Public Open Space', color: '#2E7D32', fill: '#81C784', weight: 2, dash: null, fillOpacity: 0.22, hatch: null, defaultVisible: false, swatch: 'layer-swatch-recreation' },
+    high_value_habitat: { label: 'High Value Habitat (mapped baseline)', color: '#047857', fill: '#10B981', weight: 2.2, dash: null, fillOpacity: 0.24, hatch: null, defaultVisible: false, swatch: 'layer-swatch-highhabitat' },
+    extra_urban_woodland: { label: 'Extra-urban Woodland (mapped baseline)', color: '#15803D', fill: '#4ADE80', weight: 1.8, dash: null, fillOpacity: 0.24, hatch: null, defaultVisible: false, swatch: 'layer-swatch-woodland' },
+    green_amenities:    { label: 'Allotments, Cemeteries & Local Green', color: '#65A30D', fill: '#A3E635', weight: 1.8, dash: null, fillOpacity: 0.25, hatch: null, defaultVisible: false, swatch: 'layer-swatch-amenities' },
+    amenity_allotments: { label: 'Allotments & Community Growing', color: '#65A30D', fill: '#A3E635', weight: 1.8, dash: null, fillOpacity: 0.25, hatch: null, defaultVisible: false, swatch: 'layer-swatch-amenities' },
+    allotments_community_growing: { label: 'Allotments & Community Growing', color: '#65A30D', fill: '#A3E635', weight: 1.8, dash: null, fillOpacity: 0.25, hatch: null, defaultVisible: false, swatch: 'layer-swatch-amenities' },
+    amenity_cemetery:   { label: 'Cemetery / Quiet Green Space', color: '#65A30D', fill: '#A3E635', weight: 1.8, dash: null, fillOpacity: 0.25, hatch: null, defaultVisible: false, swatch: 'layer-swatch-amenities' },
+    amenity_open_green: { label: 'Local Open Green Space', color: '#65A30D', fill: '#A3E635', weight: 1.8, dash: null, fillOpacity: 0.25, hatch: null, defaultVisible: false, swatch: 'layer-swatch-amenities' },
     scheduled_monument: { label: 'Scheduled Monument (archaeological designation)', color: '#6A1B9A', fill: '#BA68C8', weight: 2.5, dash: '6 4', fillOpacity: 0.15, hatch: 'hatch-heritage', defaultVisible: false, swatch: 'layer-swatch-monument' },
     unscheduled_archaeology: { label: 'Unscheduled Archaeology (Local Plan)', color: '#B7410E', fill: '#E07A5F', weight: 2, dash: '4 4', fillOpacity: 0.22, hatch: null, defaultVisible: false, swatch: 'layer-swatch-archaeology' },
     conservation_area:  { label: 'Conservation Area (statutory heritage)', color: '#8D6E63', fill: '#D7CCC8', weight: 2, dash: '5 4', fillOpacity: 0.22, hatch: null, defaultVisible: false, swatch: 'layer-swatch-conservation' },
@@ -463,6 +480,8 @@
     if (!meta.hatch) return;
     try {
       layerGroup.eachLayer(function (l) {
+        var gtype = l && l.feature && l.feature.geometry && l.feature.geometry.type;
+        if (gtype === 'LineString' || gtype === 'MultiLineString' || gtype === 'Point' || gtype === 'MultiPoint') return;
         var el = l.getElement && l.getElement();
         if (el) el.setAttribute('fill', 'url(#' + meta.hatch + ')');
       });
@@ -646,17 +665,24 @@
         'Policy: ' + esc(p.official_designation || 'Swindon Local Plan') + '<br>' +
         'Source: ' + esc(p.source || 'SBC Planning Portal WFS') + '<br>' +
         '<em>Local Plan archaeological notification area (indicative context).</em>';
-    } else if (p.feature_class === 'country_park_core' || p.feature_class === 'recreation_ground') {
+    } else if (p.feature_class === 'country_park_core' || p.feature_class === 'open_space_large' || p.feature_class === 'recreation_ground' || p.feature_class === 'high_value_habitat') {
       content = '<strong>' + esc(lab) + '</strong>' +
         ' <span style="color:#666">(' + esc(p.id) + ')</span><br>' +
         'Type: ' + esc(meta.label) + '<br>' +
         'Status: ' + esc(p.status || 'Adopted / Protected Open Space') + '<br>' +
-        '<em>Public open space / recreation asset (adopted planning baseline).</em>';
+        (p.area_ha != null ? 'Area: ' + esc(p.area_ha) + ' ha<br>' : '') +
+        '<em>Public open space / ecological asset (mapped baseline).</em>';
+    } else if (p.feature_class === 'strategic_railway') {
+      content = '<strong>' + esc(lab) + '</strong>' +
+        ' <span style="color:#666">(' + esc(p.id) + ')</span><br>' +
+        'Type: ' + esc(meta.label) + '<br>' +
+        '<em>Strategic rail corridor / linear green-network context.</em>';
     } else {
       content = '<strong>' + esc(lab) + '</strong>' +
         ' <span style="color:#666">(' + esc(p.id) + ')</span><br>' +
         'Type: ' + esc(meta.label) + '<br>' +
         'Status: ' + esc(p.status) + '<br>' +
+        (p.area_ha != null ? 'Area: ' + esc(p.area_ha) + ' ha<br>' : '') +
         'Date: ' + esc(p.date || '') + '<br>' +
         '<em>DRAFT / NOTHING FILED. Indicative only, not a legal boundary.</em>';
     }
@@ -670,10 +696,15 @@
     layersList.innerHTML = '';
     var layerSpecs = [
       { layer: groups.en1_green_corridor, cls: 'layer-swatch-en1', name: 'Adopted EN1 corridors (' + (groups.en1_green_corridor ? groups.en1_green_corridor.getLayers().length : 0) + ')' },
-      { layer: groups.proposed_new_areas, cls: 'layer-swatch-proposed', name: 'Proposed new areas (' + (groups.proposed_new_areas ? groups.proposed_new_areas.getLayers().length : 0) + ')' },
-      { layer: groups.amenity_water, cls: 'layer-swatch-water', name: 'Amenity water (' + (groups.amenity_water ? groups.amenity_water.getLayers().length : 0) + ')' },
+      { layer: groups.proposed_green_network_additions_2026, cls: 'layer-swatch-proposed', name: 'Proposed: 2026 additions (' + (groups.proposed_green_network_additions_2026 ? groups.proposed_green_network_additions_2026.getLayers().length : 0) + ')' },
+      { layer: groups.osm_auto_green_draft, cls: 'layer-swatch-proposed-auto', name: 'Proposed: OSM auto-drafts (' + (groups.osm_auto_green_draft ? groups.osm_auto_green_draft.getLayers().length : 0) + ')' },
+      { layer: groups.amenity_water, cls: 'layer-swatch-water', name: 'Rivers & water (' + (groups.amenity_water ? groups.amenity_water.getLayers().length : 0) + ')' },
+      { layer: groups.strategic_railway, cls: 'layer-swatch-rail', name: 'Strategic railway corridor (' + (groups.strategic_railway ? groups.strategic_railway.getLayers().length : 0) + ')' },
       { layer: groups.country_park_core, cls: 'layer-swatch-countrypark', name: 'Country Parks (' + (groups.country_park_core ? groups.country_park_core.getLayers().length : 0) + ')' },
-      { layer: groups.recreation_ground, cls: 'layer-swatch-recreation', name: 'Recreation Grounds (' + (groups.recreation_ground ? groups.recreation_ground.getLayers().length : 0) + ')' },
+      { layer: groups.open_space_large, cls: 'layer-swatch-recreation', name: 'Large Open Space & Recreation (' + (groups.open_space_large ? groups.open_space_large.getLayers().length : 0) + ')' },
+      { layer: groups.high_value_habitat, cls: 'layer-swatch-highhabitat', name: 'High Value Habitat (' + (groups.high_value_habitat ? groups.high_value_habitat.getLayers().length : 0) + ')' },
+      { layer: groups.extra_urban_woodland, cls: 'layer-swatch-woodland', name: 'Extra-urban Woodland (' + (groups.extra_urban_woodland ? groups.extra_urban_woodland.getLayers().length : 0) + ')' },
+      { layer: groups.green_amenities, cls: 'layer-swatch-amenities', name: 'Allotments, Cemetery & Local Green (' + (groups.green_amenities ? groups.green_amenities.getLayers().length : 0) + ')' },
       { layer: groups.scheduled_monument, cls: 'layer-swatch-monument', name: 'Scheduled Monuments (' + (groups.scheduled_monument ? groups.scheduled_monument.getLayers().length : 0) + ')' },
       { layer: groups.unscheduled_archaeology, cls: 'layer-swatch-archaeology', name: 'Unscheduled Archaeology (' + (groups.unscheduled_archaeology ? groups.unscheduled_archaeology.getLayers().length : 0) + ')' },
       { layer: groups.conservation_area, cls: 'layer-swatch-conservation', name: 'Conservation Areas (' + (groups.conservation_area ? groups.conservation_area.getLayers().length : 0) + ')' },
@@ -778,7 +809,7 @@
       if (cacheStatusEl) cacheStatusEl.textContent = 'Caching ' + tileUrls.length + ' map tiles...';
       showToast('Caching ' + tileUrls.length + ' map tiles for offline use...');
 
-      caches.open('gc-data-v4').then(function (cache) {
+      caches.open('gc-data-v5').then(function (cache) {
         var completed = 0;
         return Promise.all(tileUrls.map(function (url) {
           return fetch(url).then(function (resp) {
@@ -870,19 +901,29 @@
   }
 
   function loadParcels() {
-    return fetch('data/parcels-public.geojson?v=26').then(function (r) { return r.json(); }).then(function (fc) {
+    return fetch('data/parcels-public.geojson?v=27').then(function (r) { return r.json(); }).then(function (fc) {
       parcels = fc.features || [];
       var proposedSeq = buildProposedSeq(parcels);
       parcels.forEach(function (f) { f.properties = f.properties || {}; f.properties._label = displayLabel(f.properties, proposedSeq, null); });
       var countEl = document.getElementById('count');
       if (countEl) countEl.textContent = parcels.length;
 
+      var groupMembers = {
+        proposed_green_network_additions_2026: { proposed_green_network_additions_2026: true, proposed_new_areas: true },
+        open_space_large: { open_space_large: true, recreation_ground: true },
+        green_amenities: { amenity_allotments: true, allotments_community_growing: true, amenity_cemetery: true, amenity_open_green: true }
+      };
       var order = [
         'en1_green_corridor',
-        'proposed_new_areas',
+        'proposed_green_network_additions_2026',
+        'osm_auto_green_draft',
         'amenity_water',
+        'strategic_railway',
         'country_park_core',
-        'recreation_ground',
+        'open_space_large',
+        'high_value_habitat',
+        'extra_urban_woodland',
+        'green_amenities',
         'scheduled_monument',
         'unscheduled_archaeology',
         'conservation_area',
@@ -891,10 +932,17 @@
       ];
       order.forEach(function (cls) {
         var meta = CLASS_META[cls] || { color:'#607D8B', weight:2, fillOpacity:0.15 };
-        var clsFeats = parcels.filter(function(f){ return (f.properties.feature_class||'')===cls; });
+        var members = groupMembers[cls];
+        var clsFeats = parcels.filter(function(f){
+          var fcName = (f.properties && f.properties.feature_class) || '';
+          return members ? !!members[fcName] : fcName === cls;
+        });
         var g = L.geoJSON({type:'FeatureCollection', features: clsFeats}, {
-          style: function () {
-            var s = { color: meta.color, weight: meta.weight, fillColor: meta.fill || meta.color, fillOpacity: meta.hatch ? 0.001 : (meta.fillOpacity != null ? meta.fillOpacity : 0.1), opacity: 0.95 };
+          style: function (feat) {
+            var gtype = feat && feat.geometry && feat.geometry.type;
+            var isLine = gtype === 'LineString' || gtype === 'MultiLineString';
+            var s = { color: meta.color, weight: meta.weight, fillColor: meta.fill || meta.color, fillOpacity: isLine ? 0 : (meta.hatch ? 0.001 : (meta.fillOpacity != null ? meta.fillOpacity : 0.1)), opacity: 0.95 };
+            if (isLine) s.fill = false;
             if (meta.dash) s.dashArray = meta.dash;
             return s;
           },
@@ -903,9 +951,10 @@
             return L.circleMarker(latlng, { radius: r, color: meta.color, fillColor: meta.fill || meta.color, fillOpacity: 0.85, weight: 2 });
           },
           onEachFeature: function (f, l) {
+            var featCls = (f.properties && f.properties.feature_class) || cls;
             var lab = f.properties._label || f.properties.id;
             l.bindPopup(popupHtml(f.properties, lab));
-            l.on('click', function (ev) { try { L.DomEvent.stopPropagation(ev); } catch(e){} showSelectedLabel(l, lab, cls); });
+            l.on('click', function (ev) { try { L.DomEvent.stopPropagation(ev); } catch(e){} showSelectedLabel(l, lab, featCls); });
           }
         });
         groups[cls] = g;
@@ -917,10 +966,15 @@
       order.forEach(function (cls) { if (CLASS_META[cls] && CLASS_META[cls].hatch && groups[cls]) applyHatch(groups[cls], cls); });
 
       overlays['Adopted EN1 green corridors (' + (groups.en1_green_corridor ? groups.en1_green_corridor.getLayers().length : 0) + ')'] = groups.en1_green_corridor;
-      overlays['Proposed new areas - draft (' + (groups.proposed_new_areas ? groups.proposed_new_areas.getLayers().length : 0) + ')'] = groups.proposed_new_areas;
-      overlays['Amenity water (' + (groups.amenity_water ? groups.amenity_water.getLayers().length : 0) + ')'] = groups.amenity_water;
+      overlays['Proposed: 2026 additions - draft (' + (groups.proposed_green_network_additions_2026 ? groups.proposed_green_network_additions_2026.getLayers().length : 0) + ')'] = groups.proposed_green_network_additions_2026;
+      overlays['Proposed: OSM auto-drafts - draft (' + (groups.osm_auto_green_draft ? groups.osm_auto_green_draft.getLayers().length : 0) + ')'] = groups.osm_auto_green_draft;
+      overlays['Rivers & water (' + (groups.amenity_water ? groups.amenity_water.getLayers().length : 0) + ')'] = groups.amenity_water;
+      overlays['Strategic railway corridor (' + (groups.strategic_railway ? groups.strategic_railway.getLayers().length : 0) + ')'] = groups.strategic_railway;
       overlays['Country Parks (' + (groups.country_park_core ? groups.country_park_core.getLayers().length : 0) + ')'] = groups.country_park_core;
-      overlays['Recreation Grounds (' + (groups.recreation_ground ? groups.recreation_ground.getLayers().length : 0) + ')'] = groups.recreation_ground;
+      overlays['Large Open Space & Recreation (' + (groups.open_space_large ? groups.open_space_large.getLayers().length : 0) + ')'] = groups.open_space_large;
+      overlays['High Value Habitat (' + (groups.high_value_habitat ? groups.high_value_habitat.getLayers().length : 0) + ')'] = groups.high_value_habitat;
+      overlays['Extra-urban Woodland (' + (groups.extra_urban_woodland ? groups.extra_urban_woodland.getLayers().length : 0) + ')'] = groups.extra_urban_woodland;
+      overlays['Allotments, Cemetery & Local Green (' + (groups.green_amenities ? groups.green_amenities.getLayers().length : 0) + ')'] = groups.green_amenities;
       overlays['Scheduled Monuments (' + (groups.scheduled_monument ? groups.scheduled_monument.getLayers().length : 0) + ')'] = groups.scheduled_monument;
       overlays['Unscheduled Archaeology (' + (groups.unscheduled_archaeology ? groups.unscheduled_archaeology.getLayers().length : 0) + ')'] = groups.unscheduled_archaeology;
       overlays['Conservation Areas (' + (groups.conservation_area ? groups.conservation_area.getLayers().length : 0) + ')'] = groups.conservation_area;
@@ -928,7 +982,7 @@
       overlays['Registered Parks & Gardens (' + (groups.registered_park_garden ? groups.registered_park_garden.getLayers().length : 0) + ')'] = groups.registered_park_garden;
 
       try {
-        var baseGroups = ['en1_green_corridor','proposed_new_areas','amenity_water'].map(function(c){return groups[c];}).filter(Boolean);
+        var baseGroups = ['en1_green_corridor','proposed_green_network_additions_2026','osm_auto_green_draft','amenity_water','strategic_railway'].map(function(c){return groups[c];}).filter(Boolean);
         var all = L.featureGroup(baseGroups);
         map.fitBounds(all.getBounds());
       } catch (e) {}
@@ -1034,7 +1088,7 @@
 
       var menuDatesEl = document.getElementById('menu-data-dates');
       if (menuDatesEl && planningMeta.harvested_date) {
-        menuDatesEl.textContent = 'Corridors data: 2026-11-08 \u2022 Planning snapshot: ' + planningMeta.harvested_date +
+        menuDatesEl.textContent = 'Corridors data: 2026-11-12 \u2022 Planning snapshot: ' + planningMeta.harvested_date +
           ' (pending only, off by default). Verify live deadlines on pa.swindon.gov.uk.';
       }
       var entryRecencyEl = document.getElementById('entry-recency-note');
