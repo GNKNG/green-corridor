@@ -348,6 +348,8 @@
 
   // Leaflet map without default zoomControl (+/- removed for clean touchscreen/wheel use)
   var map = L.map('map', { zoomControl: false }).setView([51.568, -1.78], 11);
+  map.createPane('gardenMatrixPane');
+  map.getPane('gardenMatrixPane').style.zIndex = 350;
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     maxZoom: 19, attribution: 'OpenStreetMap contributors'
   }).addTo(map);
@@ -677,6 +679,15 @@
         ' <span style="color:#666">(' + esc(p.id) + ')</span><br>' +
         'Type: ' + esc(meta.label) + '<br>' +
         '<em>Strategic rail corridor / linear green-network context.</em>';
+    } else if (p.feature_class === 'residential_garden_zone') {
+      var hint = p.street_hint ? ('Near ' + esc(p.street_hint)) : 'Residential Block';
+      content = '<strong>' + hint + '</strong>' +
+        ' <span style="color:#666">(' + esc(p.id) + ')</span><br>' +
+        'Tier: <strong>' + esc(p.tier_label || p.garden_tier || '') + '</strong><br>' +
+        'Est. vegetated garden cover: <strong>' + esc(p.est_veg_pct) + '%</strong> (' + esc(p.est_garden_ha) + ' ha of ' + esc(p.area_ha) + ' ha block)<br>' +
+        'OSM building footprint: ' + esc(p.bldg_pct) + '% (' + esc(p.bldg_cnt) + ' buildings)<br>' +
+        'Sentinel-2 10m NDVI (May/Jun composite): ' + esc(p.ndvi_mean) + '<br>' +
+        '<em>Indicative residential matrix permeability estimate (OSM + Sentinel-2 10m). Excluded from core corridor hectare totals.</em>';
     } else {
       content = '<strong>' + esc(lab) + '</strong>' +
         ' <span style="color:#666">(' + esc(p.id) + ')</span><br>' +
@@ -712,6 +723,7 @@
       { layer: groups.registered_park_garden, cls: 'layer-swatch-park', name: 'Registered Parks & Gardens (' + (groups.registered_park_garden ? groups.registered_park_garden.getLayers().length : 0) + ')' },
       { layer: groups.ancient_woodland, cls: 'layer-swatch-ancientwoodland', name: 'Ancient Woodland (' + (groups.ancient_woodland ? groups.ancient_woodland.getLayers().length : 0) + ')' },
       { layer: groups.public_right_of_way, cls: 'layer-swatch-prow', name: 'Public Rights of Way (' + (groups.public_right_of_way ? groups.public_right_of_way.getLayers().length : 0) + ')' },
+      { layer: groups.residential_garden_zones, cls: 'layer-swatch-gardens', name: 'Residential Gardens: Rich / Moderate / Poor (' + (groups.residential_garden_zones ? groups.residential_garden_zones.getLayers().length : 0) + ')' },
       { layer: groups.planning_applications, cls: 'layer-swatch-planning', name: 'Planning Apps - Pending (' + (groups.planning_applications ? groups.planning_applications.getLayers().length : 0) + ')' },
       { layer: overlays['Community suggestions - indicative (approved)'], cls: 'layer-swatch-community', name: 'Community suggestions' },
       { layer: myPendingLayer, cls: 'layer-swatch-pending', name: 'My pending suggestions' }
@@ -809,7 +821,7 @@
       if (cacheStatusEl) cacheStatusEl.textContent = 'Caching ' + tileUrls.length + ' map tiles...';
       showToast('Caching ' + tileUrls.length + ' map tiles for offline use...');
 
-      caches.open('gc-data-v5').then(function (cache) {
+      caches.open('gc-data-v6').then(function (cache) {
         var completed = 0;
         return Promise.all(tileUrls.map(function (url) {
           return fetch(url).then(function (resp) {
@@ -1030,6 +1042,35 @@
       overlays['Community suggestions - indicative (approved)'] = layer;
     }).catch(function () {
       overlays['Community suggestions - indicative (approved)'] = L.layerGroup();
+    });
+  }
+
+  function loadGardenZones() {
+    var tierStyles = {
+      garden_rich: { color: '#16a34a', fillColor: '#22c55e', weight: 0.7, opacity: 0.32, fillOpacity: 0.22 },
+      garden_moderate: { color: '#65a30d', fillColor: '#bef264', weight: 0.6, opacity: 0.24, fillOpacity: 0.14 },
+      garden_poor: { color: '#475569', fillColor: '#64748b', weight: 0.7, opacity: 0.34, fillOpacity: 0.22 }
+    };
+    return fetch('data/residential-garden-zones.geojson?v=1').then(function (r) { if (!r.ok) throw new Error('no'); return r.json(); }).then(function (fc) {
+      var feats = (fc && fc.features) ? fc.features : [];
+      var layer = L.geoJSON({ type: 'FeatureCollection', features: feats }, {
+        pane: 'gardenMatrixPane',
+        style: function (f) {
+          var t = (f && f.properties && f.properties.garden_tier) || 'garden_moderate';
+          return tierStyles[t] || tierStyles.garden_moderate;
+        },
+        onEachFeature: function (f, l) {
+          var p = f.properties || {};
+          var lab = p.street_hint ? ('Near ' + p.street_hint) : (p.id || 'Residential Block');
+          l.bindPopup(popupHtml(p, lab));
+        }
+      });
+      groups.residential_garden_zones = layer;
+      layer.addTo(map);
+      overlays['Residential Gardens: Rich / Moderate / Poor (' + feats.length + ')'] = layer;
+    }).catch(function () {
+      groups.residential_garden_zones = L.layerGroup();
+      overlays['Residential Gardens: Rich / Moderate / Poor (0)'] = groups.residential_garden_zones;
     });
   }
 
@@ -1270,6 +1311,7 @@
   });
 
   loadParcels()
+    .then(function () { return loadGardenZones(); })
     .then(function () { return loadCommunity(); })
     .then(function () { return loadAncientWoodland(); })
     .then(function () { return loadProw(); })
