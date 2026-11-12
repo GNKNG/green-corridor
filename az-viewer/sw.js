@@ -2,14 +2,14 @@
  * Service Worker for Swindon Green Corridors PWA (az-viewer).
  * Provides offline caching for application shell, vector datasets, and viewed map tiles.
  */
-var CACHE_NAME = 'gc-viewer-v8';
-var DATA_CACHE_NAME = 'gc-data-v6';
+var CACHE_NAME = 'gc-viewer-v9';
+var DATA_CACHE_NAME = 'gc-data-v7';
 
 var STATIC_ASSETS = [
   './',
   './index.html',
-  './style.css?v=36',
-  './app.js?v=36',
+  './style.css?v=37',
+  './app.js?v=37',
   './data/library.json',
   './data/planning-swindon.geojson',
   './manifest.json',

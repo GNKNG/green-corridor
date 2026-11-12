@@ -486,6 +486,14 @@ body {
 .layer-swatch-gardens { border-color: #16a34a; border-style: solid; background: linear-gradient(135deg, rgba(34,197,94,0.45) 0%, rgba(190,242,100,0.35) 50%, rgba(100,116,139,0.45) 100%); }
 .layer-swatch-planning { border-color: #831843; border-style: solid; background: #db2777; border-radius: 50%; }
 .layer-swatch-pack { border-color: #0f766e; border-style: solid; background: rgba(45,212,191,0.5); }
+.layer-swatch-contour { border-color: #b45309; border-style: solid; background: transparent; }
+.layer-swatch-soil { border-color: #854d0e; border-style: solid; background: rgba(202,138,4,0.4); }
+.layer-swatch-alc { border-color: #15803d; border-style: solid; background: rgba(132,204,22,0.45); }
+.layer-swatch-bedrock { border-color: #0284c7; border-style: solid; background: rgba(56,189,248,0.4); }
+.layer-swatch-superficial { border-color: #d97706; border-style: solid; background: rgba(251,191,36,0.4); }
+.layer-swatch-lidar { border-color: #475569; border-style: solid; background: #94a3b8; }
+.layer-swatch-bgs50k { border-color: #2563eb; border-style: solid; background: rgba(96,165,250,0.45); }
+.layer-swatch-opentopo { border-color: #4d7c0f; border-style: solid; background: rgba(163,230,53,0.3); }
 
 /* Planning Harvest Info & Colour Key inside Layers Menu */
 .layers-harvest-info {

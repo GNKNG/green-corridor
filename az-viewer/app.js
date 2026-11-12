@@ -725,6 +725,14 @@
       { layer: groups.public_right_of_way, cls: 'layer-swatch-prow', name: 'Public Rights of Way (' + (groups.public_right_of_way ? groups.public_right_of_way.getLayers().length : 0) + ')' },
       { layer: groups.residential_garden_zones, cls: 'layer-swatch-gardens', name: 'Residential Gardens: Rich / Moderate / Poor (' + (groups.residential_garden_zones ? groups.residential_garden_zones.getLayers().length : 0) + ')' },
       { layer: groups.planning_applications, cls: 'layer-swatch-planning', name: 'Planning Apps - Pending (' + (groups.planning_applications ? groups.planning_applications.getLayers().length : 0) + ')' },
+      { layer: groups.contours_10m, cls: 'layer-swatch-contour', name: 'Elevation Contours 10m (' + (groups.contours_10m && groups.contours_10m.getLayers ? groups.contours_10m.getLayers().length : 0) + ')' },
+      { layer: groups.soilscapes, cls: 'layer-swatch-soil', name: 'Soilscapes - Cranfield Soils (' + (groups.soilscapes && groups.soilscapes.getLayers ? groups.soilscapes.getLayers().length : 0) + ')' },
+      { layer: groups.agricultural_land, cls: 'layer-swatch-alc', name: 'Agricultural Land - ALC Grades 1-5 (' + (groups.agricultural_land && groups.agricultural_land.getLayers ? groups.agricultural_land.getLayers().length : 0) + ')' },
+      { layer: groups.geology_bedrock, cls: 'layer-swatch-bedrock', name: 'BGS Bedrock Geology 625k (' + (groups.geology_bedrock && groups.geology_bedrock.getLayers ? groups.geology_bedrock.getLayers().length : 0) + ')' },
+      { layer: groups.geology_superficial, cls: 'layer-swatch-superficial', name: 'BGS Superficial Deposits 625k (' + (groups.geology_superficial && groups.geology_superficial.getLayers ? groups.geology_superficial.getLayers().length : 0) + ')' },
+      { layer: groups.lidar_dtm_wms, cls: 'layer-swatch-lidar', name: 'LiDAR 1m DTM Hillshade (EA WMS)' },
+      { layer: groups.bgs_geology_wms, cls: 'layer-swatch-bgs50k', name: 'BGS 1:50k Geology (WMS)' },
+      { layer: groups.opentopo_map, cls: 'layer-swatch-opentopo', name: 'OpenTopoMap (Topographic Basemap)' },
       { layer: overlays['Community suggestions - indicative (approved)'], cls: 'layer-swatch-community', name: 'Community suggestions' },
       { layer: myPendingLayer, cls: 'layer-swatch-pending', name: 'My pending suggestions' }
     ];
@@ -1166,6 +1174,198 @@
     });
   }
 
+  function loadContours10m() {
+    return fetch('data/contours-10m.geojson').then(function (r) { if (!r.ok) throw new Error('no'); return r.json(); }).then(function (fc) {
+      var feats = (fc && fc.features) ? fc.features : [];
+      var layer = L.geoJSON({type: 'FeatureCollection', features: feats}, {
+        style: function (f) {
+          var p = (f && f.properties) || {};
+          var isIdx = !!p.is_index;
+          return {
+            color: '#b45309',
+            weight: isIdx ? 2.5 : 1.2,
+            opacity: isIdx ? 0.9 : 0.6,
+            dashArray: isIdx ? null : '4, 4'
+          };
+        },
+        onEachFeature: function (f, l) {
+          var p = f.properties || {};
+          var elevM = p.elevation_m != null ? p.elevation_m : '?';
+          var elevFt = p.elevation_ft != null ? p.elevation_ft : '?';
+          var html = '<strong>Elevation Contour: ' + esc(elevM) + 'm</strong> (' + esc(elevFt) + ' ft AOD)<br>' +
+            '<span>' + (p.is_index ? 'Index contour (50m interval)' : '10m intermediate contour') + '</span><br>' +
+            '<span style="color:#64748b;font-size:10.5px">Source: Copernicus DEM / AWS Terrarium</span>';
+          l.bindPopup(html);
+        }
+      });
+      groups.contours_10m = layer;
+      overlays['Elevation Contours 10m (' + feats.length + ')'] = layer;
+    }).catch(function () {
+      groups.contours_10m = L.layerGroup();
+    });
+  }
+
+  function loadSoilscapes() {
+    return fetch('data/soilscapes-swindon.geojson').then(function (r) { if (!r.ok) throw new Error('no'); return r.json(); }).then(function (fc) {
+      var feats = (fc && fc.features) ? fc.features : [];
+      var palette = ['#a16207', '#ca8a04', '#d97706', '#b45309', '#65a30d', '#15803d', '#0f766e', '#0369a1', '#7c3aed'];
+      var layer = L.geoJSON({type: 'FeatureCollection', features: feats}, {
+        style: function (f) {
+          var p = (f && f.properties) || {};
+          var col = palette[Math.abs(p.SS_ID || 0) % palette.length];
+          return {
+            color: '#854d0e',
+            weight: 1.5,
+            fillColor: col,
+            fillOpacity: 0.38
+          };
+        },
+        onEachFeature: function (f, l) {
+          var p = f.properties || {};
+          var html = '<strong>Soilscape: ' + esc(p.SOILSCAPE || 'Cranfield Soil') + '</strong><br>' +
+            '<strong>Texture:</strong> ' + esc(p.TEXTURE || 'N/A') + '<br>' +
+            '<strong>Drainage:</strong> ' + esc(p.DRAINAGE || 'N/A') + '<br>' +
+            '<strong>Natural Fertility:</strong> ' + esc(p.FERTILITY || 'N/A') + '<br>' +
+            '<strong>Associated Habitat:</strong> ' + esc(p.HABITAT || 'N/A') + '<br>' +
+            '<span style="color:#64748b;font-size:10.5px">Cranfield NSRI Soilscapes (1:250k) &copy; Cranfield University</span>';
+          l.bindPopup(html);
+        }
+      });
+      groups.soilscapes = layer;
+      overlays['Soilscapes - Cranfield Soils (' + feats.length + ')'] = layer;
+    }).catch(function () {
+      groups.soilscapes = L.layerGroup();
+    });
+  }
+
+  function loadAgriculturalLand() {
+    return fetch('data/alc-swindon.geojson').then(function (r) { if (!r.ok) throw new Error('no'); return r.json(); }).then(function (fc) {
+      var feats = (fc && fc.features) ? fc.features : [];
+      function alcColor(grade) {
+        var g = String(grade || '').toLowerCase();
+        if (g.indexOf('grade 1') >= 0) return '#15803d';
+        if (g.indexOf('grade 2') >= 0) return '#22c55e';
+        if (g.indexOf('grade 3') >= 0) return '#eab308';
+        if (g.indexOf('grade 4') >= 0) return '#f97316';
+        if (g.indexOf('grade 5') >= 0) return '#ef4444';
+        return '#94a3b8';
+      }
+      var layer = L.geoJSON({type: 'FeatureCollection', features: feats}, {
+        style: function (f) {
+          var p = (f && f.properties) || {};
+          return {
+            color: '#334155',
+            weight: 1.2,
+            fillColor: alcColor(p.ALC_GRADE),
+            fillOpacity: 0.42
+          };
+        },
+        onEachFeature: function (f, l) {
+          var p = f.properties || {};
+          var html = '<strong>Agricultural Land: ' + esc(p.ALC_GRADE || 'ALC Grade') + '</strong><br>' +
+            '<span>Provisional Agricultural Land Classification (England).</span><br>' +
+            '<span style="color:#64748b;font-size:10.5px">Source: Natural England Open Data &copy; Crown Copyright</span>';
+          l.bindPopup(html);
+        }
+      });
+      groups.agricultural_land = layer;
+      overlays['Agricultural Land - ALC Grades 1-5 (' + feats.length + ')'] = layer;
+    }).catch(function () {
+      groups.agricultural_land = L.layerGroup();
+    });
+  }
+
+  function loadGeology() {
+    var pBedrock = fetch('data/geology-bedrock-swindon.geojson').then(function (r) { if (!r.ok) throw new Error('no'); return r.json(); });
+    var pSuperficial = fetch('data/geology-superficial-swindon.geojson').then(function (r) { if (!r.ok) throw new Error('no'); return r.json(); });
+
+    return Promise.all([pBedrock, pSuperficial]).then(function (results) {
+      var bFc = results[0];
+      var sFc = results[1];
+      var bFeats = (bFc && bFc.features) ? bFc.features : [];
+      var sFeats = (sFc && sFc.features) ? sFc.features : [];
+
+      groups.geology_bedrock = L.geoJSON({type: 'FeatureCollection', features: bFeats}, {
+        style: function (f) {
+          var p = (f && f.properties) || {};
+          return {
+            color: '#0369a1',
+            weight: 1.5,
+            fillColor: p.HEX_COLOR || '#0284c7',
+            fillOpacity: 0.4
+          };
+        },
+        onEachFeature: function (f, l) {
+          var p = f.properties || {};
+          var title = p.AGE || p.LEX_RCS || 'Bedrock Geology';
+          var html = '<strong>BGS Bedrock: ' + esc(title) + '</strong><br>' +
+            '<strong>Lithology:</strong> ' + esc(p.LITHOLOGY || 'N/A') + '<br>' +
+            '<strong>Period:</strong> ' + esc(p.PERIOD || 'N/A') + (p.ERA ? ' (' + esc(p.ERA) + ')' : '') + '<br>' +
+            '<strong>Environment:</strong> ' + esc(p.ENVIRONMENT || 'N/A') + '<br>' +
+            '<span style="color:#64748b;font-size:10.5px">BGS 1:625k Bedrock Geology &copy; British Geological Survey</span>';
+          l.bindPopup(html);
+        }
+      });
+      overlays['BGS Bedrock Geology 625k (' + bFeats.length + ')'] = groups.geology_bedrock;
+
+      groups.geology_superficial = L.geoJSON({type: 'FeatureCollection', features: sFeats}, {
+        style: function () {
+          return {
+            color: '#b45309',
+            weight: 1.5,
+            fillColor: '#f59e0b',
+            fillOpacity: 0.45
+          };
+        },
+        onEachFeature: function (f, l) {
+          var p = f.properties || {};
+          var title = p.LEGEND_DESCRIPTION || p.LEX_ROCK || 'Superficial Deposit';
+          var html = '<strong>BGS Superficial: ' + esc(title) + '</strong><br>' +
+            '<strong>Process:</strong> ' + esc(p.PROCESS || 'Water processes') + '<br>' +
+            '<strong>Environment:</strong> ' + esc(p.ENVIRONMENT || 'River deposits / alluvium') + '<br>' +
+            '<span style="color:#64748b;font-size:10.5px">BGS 1:625k Superficial Deposits &copy; British Geological Survey</span>';
+          l.bindPopup(html);
+        }
+      });
+      overlays['BGS Superficial Deposits 625k (' + sFeats.length + ')'] = groups.geology_superficial;
+    }).catch(function () {
+      groups.geology_bedrock = L.layerGroup();
+      groups.geology_superficial = L.layerGroup();
+    });
+  }
+
+  function initWmsLayers() {
+    try {
+      groups.lidar_dtm_wms = L.tileLayer.wms('https://environment.data.gov.uk/spatialdata/lidar-composite-digital-terrain-model-dtm-1m/wms', {
+        layers: 'Lidar_Composite_Hillshade_DTM_1m',
+        format: 'image/png',
+        transparent: true,
+        attribution: 'LiDAR 1m DTM &copy; Environment Agency',
+        maxZoom: 19,
+        opacity: 0.75
+      });
+      overlays['LiDAR 1m DTM Hillshade (EA WMS)'] = groups.lidar_dtm_wms;
+
+      groups.bgs_geology_wms = L.tileLayer.wms('https://map.bgs.ac.uk/arcgis/services/BGS_Detailed_Geology/MapServer/WMSServer', {
+        layers: 'BGS.50k.Bedrock,BGS.50k.Superficial.deposits',
+        format: 'image/png',
+        transparent: true,
+        attribution: 'BGS 1:50k Geology &copy; British Geological Survey',
+        maxZoom: 19,
+        opacity: 0.65
+      });
+      overlays['BGS 1:50k Geology (WMS)'] = groups.bgs_geology_wms;
+
+      groups.opentopo_map = L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
+        maxZoom: 17,
+        attribution: 'Map: &copy; OpenStreetMap contributors, SRTM | Style: &copy; OpenTopoMap (CC-BY-SA)',
+        opacity: 0.85
+      });
+      overlays['OpenTopoMap (Topographic Basemap)'] = groups.opentopo_map;
+    } catch (e) {}
+    return Promise.resolve();
+  }
+
   function copyTextToClipboard(text) {
     if (navigator.clipboard && navigator.clipboard.writeText) {
       navigator.clipboard.writeText(text).catch(function () {});
@@ -1316,6 +1516,11 @@
     .then(function () { return loadAncientWoodland(); })
     .then(function () { return loadProw(); })
     .then(function () { return loadPlanningApplications(); })
+    .then(function () { return loadContours10m(); })
+    .then(function () { return loadSoilscapes(); })
+    .then(function () { return loadAgriculturalLand(); })
+    .then(function () { return loadGeology(); })
+    .then(function () { return initWmsLayers(); })
     .catch(function () {})
     .then(function () {
       renderMyPending();
