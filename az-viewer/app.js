@@ -695,7 +695,7 @@
         'Status: ' + esc(p.status) + '<br>' +
         (p.area_ha != null ? 'Area: ' + esc(p.area_ha) + ' ha<br>' : '') +
         'Date: ' + esc(p.date || '') + '<br>' +
-        '<em>DRAFT / NOTHING FILED. Indicative only, not a legal boundary.</em>';
+        '<em>REPRESENTATION FILED 12 Nov 2026. Indicative only, not a legal boundary.</em>';
     }
     return content + shareButtonHtml(p._label || p.id || lab, lab);
   }
