@@ -921,7 +921,7 @@
   }
 
   function loadParcels() {
-    return fetch('data/parcels-public.geojson?v=27').then(function (r) { return r.json(); }).then(function (fc) {
+    return fetch('data/parcels-public.geojson?v=28').then(function (r) { return r.json(); }).then(function (fc) {
       parcels = fc.features || [];
       var proposedSeq = buildProposedSeq(parcels);
       parcels.forEach(function (f) { f.properties = f.properties || {}; f.properties._label = displayLabel(f.properties, proposedSeq, null); });
@@ -1059,7 +1059,7 @@
       garden_moderate: { color: '#65a30d', fillColor: '#bef264', weight: 0.6, opacity: 0.24, fillOpacity: 0.14 },
       garden_poor: { color: '#475569', fillColor: '#64748b', weight: 0.7, opacity: 0.34, fillOpacity: 0.22 }
     };
-    return fetch('data/residential-garden-zones.geojson?v=1').then(function (r) { if (!r.ok) throw new Error('no'); return r.json(); }).then(function (fc) {
+    return fetch('data/residential-garden-zones.geojson?v=2').then(function (r) { if (!r.ok) throw new Error('no'); return r.json(); }).then(function (fc) {
       var feats = (fc && fc.features) ? fc.features : [];
       var layer = L.geoJSON({ type: 'FeatureCollection', features: feats }, {
         pane: 'gardenMatrixPane',
@@ -1137,7 +1137,7 @@
 
       var menuDatesEl = document.getElementById('menu-data-dates');
       if (menuDatesEl && planningMeta.harvested_date) {
-        menuDatesEl.textContent = 'Corridors data: 2026-11-12 \u2022 Planning snapshot: ' + planningMeta.harvested_date +
+        menuDatesEl.textContent = 'Corridors data: 2026-11-23 \u2022 Planning snapshot: ' + planningMeta.harvested_date +
           ' (pending only, off by default). Verify live deadlines on pa.swindon.gov.uk.';
       }
       var entryRecencyEl = document.getElementById('entry-recency-note');
