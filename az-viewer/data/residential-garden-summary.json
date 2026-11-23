@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "generated_date": "2026-11-12",
+  "generated_date": "2026-11-23",
   "scope": "urban-swindon-built-envelope",
   "sources": {
     "osm": "OpenStreetMap (landuse=residential, highway/rail/water street blocks, building footprints, ODbL)",
@@ -17,43 +17,43 @@
   },
   "metrics": {
     "urban_envelope_ha": 6482.52,
-    "mapped_green_network_excluded_ha": 1694.54,
-    "residential_zones_count": 1338,
-    "residential_matrix_area_ha": 2379.67,
-    "estimated_vegetated_garden_ha": 1033.66,
-    "overall_residential_veg_pct": 43.4,
+    "mapped_green_network_excluded_ha": 1672.49,
+    "residential_zones_count": 1329,
+    "residential_matrix_area_ha": 2394.55,
+    "estimated_vegetated_garden_ha": 1046.02,
+    "overall_residential_veg_pct": 43.7,
     "by_tier": {
       "garden_rich": {
-        "blocks": 474,
-        "area_ha": 1134.6,
-        "est_garden_ha": 586.2,
-        "share_of_res_pct": 47.7
+        "blocks": 487,
+        "area_ha": 1224.02,
+        "est_garden_ha": 630.34,
+        "share_of_res_pct": 51.1
       },
       "garden_moderate": {
-        "blocks": 501,
-        "area_ha": 994.9,
-        "est_garden_ha": 394.35,
-        "share_of_res_pct": 41.8
+        "blocks": 482,
+        "area_ha": 923.22,
+        "est_garden_ha": 363.32,
+        "share_of_res_pct": 38.6
       },
       "garden_poor": {
-        "blocks": 363,
-        "area_ha": 250.18,
-        "est_garden_ha": 53.1,
-        "share_of_res_pct": 10.5
+        "blocks": 360,
+        "area_ha": 247.31,
+        "est_garden_ha": 52.36,
+        "share_of_res_pct": 10.3
       }
     },
     "corridor_100m_residential_context": {
       "en1_100m_buffer_ha": {
-        "garden_rich": 426.46,
-        "garden_moderate": 225.89,
-        "garden_poor": 32.5
+        "garden_rich": 433.29,
+        "garden_moderate": 221.0,
+        "garden_poor": 32.29
       },
       "proposed_2026_100m_buffer_ha": {
-        "garden_rich": 397.53,
-        "garden_moderate": 356.45,
-        "garden_poor": 65.28
+        "garden_rich": 438.96,
+        "garden_moderate": 292.78,
+        "garden_poor": 62.16
       }
     }
   },
-  "output_bytes": 1205735
+  "output_bytes": 1220059
 }
